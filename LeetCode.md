@@ -6,6 +6,8 @@
 
 This question needs to find out whether a vector includes a duplicate. Note that using two for-loops will cause a timeout for a large dataset($O(n^2)$). In this question, we need to use the **set** to minimize the running time. Here is the [set doc](https://www.cplusplus.com/reference/set/set/).
 
+##### CPP
+
 ```c++
 #include <set>
 
@@ -36,11 +38,45 @@ bool containsDuplicate(vector<int>& nums) {
 }
 ```
 
+##### JAVA
+
+```java
+class Solution {
+    public boolean containsDuplicate(int[] nums) {
+        Set<Integer> numbers = new HashSet<Integer>();
+        for (int num : nums) {
+            if (numbers.contains(num)) return true;
+            numbers.add(num);
+        }
+        return false;
+    }
+}
+```
+
+##### PYTHON
+
+```py
+class Solution(object):
+    def containsDuplicate(self, nums):
+        hashset = set()
+        for n in nums:
+            if n in hashset:
+                return True
+            hashset.add(n)
+        return False
+```
+
+
+
 #### [**242 Valid Anagram**](https://leetcode.com/problems/valid-anagram/)
 
 An **Anagram** is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
 
 In this question, we choose to use the function **str.find_first_of(key)** to check the char in **t** is in **s**. Then, we erase the according to the character in **t**. However, we use **erase** function in the coding. It is not ideal since removing an element from a string cost about $O(n)$ time. (String is an array, and deleting an element need to resize the string).
+
+Second way: the easiest way to do this is sort two strings so that will be much eaiser to compare. The sort time complexity will be $O(nlogn)$ which will be quick. 
+
+##### CPP
 
 ```c++
 class Solution {
@@ -57,7 +93,60 @@ public:
         return true;
     }
 };
+
+//second way
+#include<bits/stdc++.h>
+using namespace std;
+
+class Solution {
+public:
+    bool isAnagram(string s, string t) {
+        sort(s.begin(), s.end());
+        sort(t.begin(), t.end());
+        cout << s;
+        cout << t;
+        if (s != t) {
+            return false;
+        }
+        return true;
+    }
+};
 ```
+
+
+
+##### JAVA
+
+```java
+import java.util.Arrays;
+
+class Solution {
+    public boolean isAnagram(String s, String t) {
+        char Array1[] = s.toCharArray();
+        char Array2[] = t.toCharArray();
+        Arrays.sort(Array1);
+        Arrays.sort(Array2);
+        String str1 = new String(Array1);
+        String str2 = new String(Array2);
+        
+        return str1.equals(str2);
+    }
+}
+```
+
+##### PYTHON
+
+```pyth
+class Solution(object):
+    def isAnagram(self, s, t):
+        a = sorted(s)
+        b = sorted(t)
+        if a == b:
+            return True
+        return False
+```
+
+
 
 #### [**1. Two Sum**](https://leetcode.com/problems/two-sum/)
 
