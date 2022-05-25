@@ -490,3 +490,43 @@ public:
 };
 ```
 
+#### [**167. Two Sum II**](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/)
+
+Similar to Two Sum. Note that it is a not-decreasing order vector, which means it has more information than the original question. To utilize this info, we can set the check celling for the vector and find the other number from the back. Since we know that the previous element is smaller or equal to the current element, the back elements checked from the previous loop are 100% invalid for the current one. Here is the example
+
+```c++
+a = [1,2,3,4,6,7,9];
+target = 6;
+//In the first loop, we will find the pair of number 1. We need to find the number of 5
+//Check from the back, we know that sub-array = [6,7,9] are impossible since it is larger than 5
+//This means for the following loop, we do not need to consider this sub-array because the number we need to find must be less than 5. Then, we set celling as 4.
+//In the second loop, we will find the pair of number 2. We need to find the number of 4.
+//Because we have the celling, we will hit the answer for the first find, which is 4.
+```
+
+This algorithm is beneficial. We do not need to consider the number hit (**may not** use the same element twice.), since we will find the right answer before the number hit.
+
+```c++
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& numbers, int target) {
+        int end  = numbers.size()-1;
+        for(int i = 0; i < numbers.size(); i++) {
+            int check = target - numbers[i];
+            for(int j = end; j > i; j--){
+                if(numbers[j] == check){
+                    auto a = vector<int>();
+                    a.push_back(i+1);
+                    a.push_back(j+1);
+                    return a;
+                } else if(numbers[j] < check){
+                    break;
+                }
+                end--;
+            } 
+        }
+        return vector<int>();
+    }
+};
+```
+
