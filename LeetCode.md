@@ -411,3 +411,42 @@ public:
 };
 ```
 
+#### [**128. Longest Consecutive Sequence**](https://leetcode.com/problems/longest-consecutive-sequence/)
+
+We need to find the longest consecutive sequence given $O(n)$ time. This means that we can not use double loops, but we can sort the given vector and traverse the sorted vector to gain $O(2n)$ time. Use **count** to check the largest count number and **check** to trace each consecutive sequence. There may exist some improvement for the variable boolean **start**. 
+
+**sort** function is in STL library, which can sort the vector.
+
+```c++
+class Solution {
+public:
+    int longestConsecutive(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        int count = 0;
+        int check = 0;
+        bool start = true;
+        for(int i = 0; i < nums.size(); i++){
+            if(start || nums[i-1]+1 == nums[i]){
+                check++;
+                start = false;
+                
+            } else if(!start && nums[i-1] == nums[i]){
+                start = false;
+            } else{
+                if(count < check) {
+                    count = check;
+                }
+                check = 1;
+                start= false;
+            }
+        }
+         if(count < check) {
+                    count = check;
+                }
+        return count;
+    }
+};
+```
+
+
+
