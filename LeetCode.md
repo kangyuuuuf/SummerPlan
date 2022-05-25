@@ -504,7 +504,7 @@ target = 6;
 //Because we have the celling, we will hit the answer for the first find, which is 4.
 ```
 
-This algorithm is beneficial. We do not need to consider the number hit (**may not** use the same element twice.), since we will find the right answer before the number hit.
+This algorithm is beneficial. The running time will become $O(n)$. We do not need to consider the number hit (**may not** use the same element twice.) since we will find the right answer before the number hit.
 
 ```c++
 class Solution {
