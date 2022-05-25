@@ -4,7 +4,7 @@ This is the 2022 Summer Plan for Eric and Elio. The plan includes the learning o
 
 ## Content
 
-For the leetcode, we will follow the order of questions from [Neetcode](https://neetcode.io/). Mainly, we will focus on the questions on the website [Leetcode](https://leetcode.com/) and [Lintcode](https://www.lintcode.com/).
+For the leetcode, we will follow the order of 150 questions from [Neetcode](https://neetcode.io/). Mainly, we will focus on the questions on the website [Leetcode](https://leetcode.com/) and [Lintcode](https://www.lintcode.com/).
 
 For the introduction of the Algorithm, we will learn using the book, *Introduction to Algorithms, 4th Edition*.
 
@@ -16,10 +16,10 @@ We are expecting **10** hours each week to focus on the leetcode. Given 5 weekda
 
 #### Current Progress
 
-| Topic           | Progress |
-| --------------- | -------- |
-| Array & Hashing | (9/9)    |
-|                 |          |
+| Topic           | Progress | Completion Date |
+| --------------- | -------- | --------------- |
+| Array & Hashing | (9/9)    | 5/25            |
+|                 |          |                 |
 
 For the introduction of the Algorithm, we will meet twice a week, Tuesday and Thursday, to discuss the question in the book. Before each meeting, we need to finish the reading of the book. The meeting will last 3 hours.
 
