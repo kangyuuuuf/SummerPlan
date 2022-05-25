@@ -302,3 +302,112 @@ public:
 };
 ```
 
+#### [**36. Valid Sudoku**](https://leetcode.com/problems/valid-sudoku/)
+
+Since it is likely that there is a sparse matrix given from the question, we could check the valid number cell each time.  When we iterate a valid cell, check its row and column. And We check the sub-box.
+
+```c++
+class Solution {
+public:
+    bool isValidSudoku(vector<vector<char>>& board) {
+        for(int i = 0; i < 9; i++){
+            for(int j =0; j < 9; j++){
+               if(board[i][j] != '.'){
+                   for(int k = 0; k < 9; k++){
+                       if(board[i][k] == board[i][j] && j != k){
+                           return false;
+                       }
+                       if(board[k][j] == board[i][j] && i != k){
+                           return false;
+                       }
+                       
+                   }
+                   int xp = i/3*3;
+                   int yp = j/3*3;
+                   for(int p =0; p < 3; p++) {
+                       for(int q = 0; q < 3; q++){
+                           int x =p + xp;
+                           int y =q + yp;
+                           if(board[x][y] == board[i][j] && (j != y || i != x)){
+                               return false;
+                            }
+                       }
+                   }
+               } 
+            }
+        }
+        return true;
+    }
+};
+```
+
+
+
+#### [**Encode and Decode Strings**](https://www.lintcode.com/problem/659/)
+
+Although we could choose the divided mark by ourselves,  the outcome after encoding and decoding must be the same. For example, if we use “:” to divide the string, we need to handle the situation that “:” is already existed in string.
+
+**substr** takes two arguments, the start position, and the substring length! **NOT THE END POSITION!!!!**
+
+The difference between **find** and **find_first_of**: **find** is to find the first appeared given string, while **find_first_of** is to find the first appeared character among the given string.
+
+```c++
+class Solution {
+public:
+    /*
+     * @param strs: a list of strings
+     * @return: encodes a list of strings to a single string.
+     */
+    string encode(vector<string> &strs) {
+        // write your code here
+        string out = "";
+        if(strs.size() == 0) return out;
+        if(strs.size() == 1) return strs[0];
+        out += strs[0];
+        size_t idx = 1;
+        for(int i = 1; i < strs.size(); i++){
+            out += ":;";
+            string check = strs[i];
+            size_t found = check.find(':');
+            while(found != string::npos){
+                check.replace(found,1,"::");
+                found = check.find(':', found+2);
+            }
+            out += check;
+        }
+        cout << out << endl;
+        return out;
+    }
+
+    /*
+     * @param str: A string
+     * @return: dcodes a single string to a list of strings
+     */
+    vector<string> decode(string &str) {
+        // write your code here
+        if(str.length() == 0) return vector<string>();
+        vector<string> out;
+        size_t start = 0;
+        size_t found = str.find(":;");
+        while(found != string::npos){
+            string input = str.substr(start,found-start);
+            size_t check = input.find("::");
+            if(check != string::npos){
+                input.replace(check,2,":");
+            }
+            start = found + 2;
+            out.push_back(input);
+            found = str.find(":;", found+2);
+            cout<< input << endl;
+        }
+        string input = str.substr(start,str.length());
+        size_t check = input.find("::");
+        if(check != string::npos){
+            input.replace(check,2,":");
+        }
+        out.push_back(input);
+        return out;
+    }
+};
+```
+
