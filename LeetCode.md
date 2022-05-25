@@ -448,5 +448,45 @@ public:
 };
 ```
 
+## Two Pointers
 
+#### [**125. Valid Palindrome**](https://leetcode.com/problems/valid-palindrome/)
+
+A phrase is a **palindrome** if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.
+
+In this question, we need to do two preparations: change the string to lower case and remove all non-alphanumeric characters. We need to use the function **remove_if** to get the index of characters and use **erase** to delete the corresponding characters. Note that we can put the function as a parameter. Then, we can use the function **remove_if** in various conditions. For example:
+
+```c++
+auto it = remove_if(a,b,c);
+//a as the start of the object
+//b as the end of the object
+//c as the judgement function, determine which elements need to remove.
+```
+
+**c** could be a boolean function to check the lowercase or non-alphanumeric characters.
+
+Then, we need to get a new string that is the original reverse. Using the in-build function and string constructor, we can get the reverse. **rbegin()** and **rend()** is the reverse iteration of string.
+
+```c++
+//s is the orginal string
+string rev = string(s.rbegin(), s.rend());
+```
+
+ Then, we check wether they are equal.
+
+```c++
+class Solution {
+public:
+    bool isPalindrome(string s) {
+        auto it = remove_if(s.begin(),s.end(), [](char const & c){
+            return !isalnum(c);
+        });
+        s.erase(it,s.end());
+        std::transform(s.begin(), s.end(), s.begin(),
+        [](unsigned char c){ return std::tolower(c); });
+        string rev = string(s.rbegin(), s.rend());
+        return rev == s;
+    }
+};
+```
 
