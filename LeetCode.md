@@ -530,3 +530,96 @@ public:
 };
 ```
 
+#### [**15. 3Sum**](https://leetcode.com/problems/3sum/)
+
+We need to find a solution that is less than $O(n^3)$ or a time Exceeded will occur.  We can get the idea from **Two Sum II**, sorting the vector and using two pointers to find the possible solution. Then, the question will become $n$ times **Two Sum** questions. (Iterate each element in the vector and regard it as the **target**).
+
+Also, we need to consider the duplicate problem. After the first iteration, we need to check whether the current element equals the last element. If the condition is true, pass the current iteration. This solution is not ideal, but it is the best answer I can get.
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        if(nums.size() < 3) return vector<vector<int>>();
+        sort(nums.begin(), nums.end());
+        vector<vector<int>> out;
+        for(int i = 0; i < nums.size()-2; i++) {
+            if(i > 0){
+                if(nums[i] == nums[i-1]){
+                    continue;
+                }
+            }
+            int front = i + 1;
+            int back = nums.size()-1;
+            int current = 0;
+            while(front < back){
+                if(front > i + 1){
+                    if(nums[front] == nums[front-1]){
+                        front++;
+                        continue;
+                    }
+                }                
+                if(back < (nums.size()-1)){
+                    if(nums[back] == nums[back+1]){
+                        back--;
+                        continue;
+                    }
+                }
+                current = -(nums[front] + nums[back]);
+                if(current > nums[i]){
+                    front++;
+                } else if(current < nums[i]){
+                    back--;
+                } else {
+                    out.push_back({nums[i],nums[front],nums[back]});
+                    back--;
+                    front++;
+                }
+            }
+        }
+        return out;
+    }
+};
+```
+
+#### [**11. Container with Most Water**](https://leetcode.com/problems/container-with-most-water/)
+
+In this question, of course, we can use two for-loops to solve the question, making a $O(n^2)$ running time. However, there is an algorithm that can reduce the running time to $O(n)$.
+
+1. Set **front** as 0 and **back** as the last index of height.
+2. calculate the area, change the max value if necessary
+3. find the min(**front**, **back**), moving the index with a smaller value inward. (front++/back- -).
+4. Repeat step 2 until **front** >= **back**.
+
+As far as I could say, it is a greedy algorithm, which means that each step we move is based on the current best situation. However, it is hard to prove.
+
+```c++
+class Solution {
+public:
+    int maxArea(vector<int>& height) {
+        int front = 0;
+        int back = height.size() - 1;
+        int current = 0;
+        int maxv = 0;
+        while (front < back) {
+            current = (back - front) * min(height[front], height[back]);
+            maxv = max(maxv,current);
+            if(height[front] > height[back]){
+                back--;
+            } else {
+                front++;
+            }
+        }
+        return maxv;
+    }
+    int min(int a, int b) {
+        if (a > b) return b;
+        return a;
+    }
+    int max(int a, int b) {
+        if (a > b) return a;
+        return b;
+    }
+};
+```
+
