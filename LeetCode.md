@@ -450,6 +450,8 @@ public:
 
 ## Two Pointers
 
+**Two Pointers Technique**	Two pointers is really an easy and effective technique that is typically used for searching pairs in a **sorted** array.
+
 #### [**125. Valid Palindrome**](https://leetcode.com/problems/valid-palindrome/)
 
 A phrase is a **palindrome** if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.
@@ -591,7 +593,7 @@ In this question, of course, we can use two for-loops to solve the question, mak
 3. find the min(**front**, **back**), moving the index with a smaller value inward. (front++/back- -).
 4. Repeat step 2 until **front** >= **back**.
 
-As far as I could say, it is a greedy algorithm, which means that each step we move is based on the current best situation. However, it is hard to prove.
+As far as I could say,  each step we move is based on the current best situation. However, it is hard to prove.
 
 ```c++
 class Solution {
@@ -653,6 +655,94 @@ public:
             return a;
         }
         return b;
+    }
+};
+```
+
+## Window Sliding
+
+**Window Sliding Technique**	Window sliding is a computational technique that aims to reduce the use of nested loops and replace it with a single loop, thereby reducing the time complexity.
+
+**Prerequisite to use Sliding window technique**	The use of Sliding Window technique can be done in a very specific scenario, where the **size of window** for computation is **fixed** throughout the complete nested loop. Only then the time complexity can be reduced. 
+
+1. Find the size of window required 
+2. Compute the result for 1st window, i.e. from start of data structure
+3. Then use a loop to slide the window by 1, and keep computing the result window by window.
+
+#### [**121. Best Time to Buy & Sell Stock**](https://leetcode.com/problems/best-time-to-buy-and-sell-stock/)
+
+This question is not an ideal window sliding question. However, the running time can be reduced to $O(n)$ ;
+
+Since we know that the selling date is after buying date, we can set our current selling date as the last day. When we iterate the array from behind. If we find another higher price(greater than the current max selling price), we can replace the max price. Or, we can regard the current day as buying date and calculate the profit.
+
+```C++
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int maxi = prices[prices.size() -1];
+        int profit = 0;
+        for(int i = prices.size() -2; i > -1; i--) {
+            if(prices[i] > maxi){
+                maxi = prices[i];
+            }
+            int cur = maxi - prices[i];
+            profit = max(cur, profit);
+        }
+        return profit;
+    }
+};
+```
+
+Also, we can set the current buying date as the first day and iterate the array. It seems that it is more efficient than we iterate backward.
+
+```c++
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int mini = prices[0];
+        int profit = 0;
+        for(int i = 1; i < prices.size(); i++) {
+            if(prices[i] < mini){
+                mini = prices[i];
+            }
+            int cur = prices[i] - mini;
+            profit = max(cur, profit);
+        }
+        return profit;
+    }
+};
+```
+
+#### [**3. Longest Substring Without Repeating Characters**](https://leetcode.com/problems/longest-substring-without-repeating-characters/)
+
+The window can be changed in this question. When we use **std::string::find** to find a repeating character, we need to set our window to correct value. 
+
+```c++
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        if(s.length() == 0) return 0;
+        int a = 0;
+        int b = 1;
+        int l = 1;
+        int count = 1;
+        while (b < s.length()) {
+            size_t c = s.substr(a,b-a).find(s[b]);
+            if( c == std::string::npos){
+                count++;
+                if(count > l) l = count;
+                b++;
+            } else {
+                if(count > l) {
+                    l = count;
+                }
+                a = a+c+1;
+                count = b-a + 1;
+                b++;
+            }
+        }
+        return l;
+
     }
 };
 ```
