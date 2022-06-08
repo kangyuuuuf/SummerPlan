@@ -623,3 +623,37 @@ public:
 };
 ```
 
+#### [**42. Trapping Rain Water**](https://leetcode.com/problems/trapping-rain-water/)
+
+The same type of question. We need two-pointers and choose the next step base on the current situation. When we need to solve this type  of question, we need to control our running time as $O(n)$. When we have two pointers, front and back, we can move one pointer each time to solve the piece of the problem.
+
+```c++
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int level = 0;
+        int front = 0;
+        int back = height.size()-1;
+        int sum = 0;
+        while(front < back){
+            if(height[front] < level) sum += (level - height[front]);
+            if(height[back] < level) sum += (level - height[back]);
+            if(height[front] < height[back]){
+                level = max(height[front], level);
+                front++;
+            } else {
+                level = max(height[back], level);
+                back--;
+            }
+        }
+        return sum;
+    }
+    int max(int a, int b){
+        if(a > b) {
+            return a;
+        }
+        return b;
+    }
+};
+```
+
