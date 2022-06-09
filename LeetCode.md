@@ -747,3 +747,79 @@ public:
 };
 ```
 
+#### [**424. Longest Repeating Character Replacement**](https://leetcode.com/problems/longest-repeating-character-replacement/) (Unable to Solve)
+
+The solution to this problem is written based on the discussion from [link](https://leetcode.com/problems/longest-repeating-character-replacement/discuss/2130806/C%2B%2Beasy-to-understand). However, his solution is complicated and includes some meaningless lines. The code is improved to increase the readability and it can be divided into the following steps.
+
+1. set the window (left and right), a number to count the current most frequent char, a number to count the length, and a map to count the frequency of chars.
+2. Update the frequency in the map for the current char on the right.
+3. check whether the current window is valid
+   - if it is valid, check the current window length and update the outcome if it is smaller. Right++
+   - if it is invalid, the current window needs to shrink. Left++, Right++, and update the frequency due to left change
+4. Repeat step 2 if Right is less than size of string
+
+```c++
+class Solution {
+public:
+    int characterReplacement(string s, int k) {
+        int l = 0;
+        int r = 0;
+        int out = 0;
+        int count = 0;
+        unordered_map<char,int> check;
+        while (r < s.length()){
+            check[s[r]]++;
+            count = max(count, check[s[r]]);
+            if((r-l+1-count)>k) {
+                check[s[l]]--;
+                l++;
+                r++;
+            } else {
+                out = max(out, r-l+1);
+                r++;
+            }
+        }
+        return out;
+    }
+};
+```
+
+#### [**567. Permutation in String**](https://leetcode.com/problems/permutation-in-string/)
+
+In this question, we still use unordered_map to solve the problem. We set a variable **count**, using **count** to check whether the current window is a premutation of **s1**. If **count** drops to zero, it means that we find the correct window. Note that in this question, the window is fixed. But we still use changeable variables, l and r, to set the window because we need to start to count at **s2** start.
+
+```c++
+class Solution {
+public:
+    bool checkInclusion(string s1, string s2) {
+        unordered_map<char,int> check;
+        for(auto a : s1){
+            check[a]++;
+        }
+        int count = check.size();
+        int l = 0;
+        int r = 0;
+        while(r < s2.size()){
+            if(check.find(s2[r])  != check.end()){
+                check[s2[r]]--;
+                if(check[s2[r]] == 0){
+                    count--;
+                }
+            }
+            if((r-l+1) < s1.size()) r++;
+            else if ((r-l+1) == s1.size()){
+                if(count == 0) return true;
+                if(check.find(s2[l]) != check.end()){
+                    if(check[s2[l]] == 0) count++;
+                    check[s2[l]]++;
+                }
+                l++;
+                r++;
+                
+            }
+        }
+        return false;
+    }
+};
+```
+
