@@ -823,3 +823,94 @@ public:
 };
 ```
 
+#### [**76. Minimum Window Substring**](https://leetcode.com/problems/minimum-window-substring/)
+
+We can still use Sliding Window to solve this problem. However, there are a few adjustments to the window boundary. Here is the strategy:
+
+- If the current window does not contain all the chars in **s**, Right++. Next iteration checks the right boundary.
+- If the current window does contain all the chars in **s**, Left++. Next iteration checks the left boundary.
+- When the **count** change from 0 to 1, it means that Left++ in the last iteration will cause an invalid window string. Therefore, the window in the last iteration is the valid optimized substring. Check it with the current minimum **len**.
+
+```c++
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        unordered_map<char,int> check;
+        for(auto a : t) check[a]++;
+        int l = 0;
+        int r = 0;
+        int ls = 0;
+        int len = numeric_limits<int>::max();
+        int count = check.size();
+        int rc = true;
+        int had = false;
+        while (r < s.length()) {
+            if(rc){
+                if(check.find(s[r]) != check.end()){
+                    check[s[r]]--;
+                    if(check[s[r]] == 0){
+                        count--;
+                    }
+                }
+            } else {
+                if(check.find(s[l-1]) != check.end()){
+                    check[s[l-1]]++;
+                    if(check[s[l-1]] == 1){
+                        count++;
+                        if(count == 1){
+                            if (r-l+2 < len) {
+                                len = r-l+2;
+                                ls = l-1;
+                                had = true;
+                            }
+                        }
+                    }
+                }
+            }
+            if(count == 0) {
+                l++;
+                rc = false;
+                
+            } else {
+                r++;
+                rc = true;
+            }
+        }
+        if(had) return s.substr(ls,len);
+        return "";
+    }
+};
+```
+
+#### [**239. Sliding Window Maximum**](https://leetcode.com/problems/sliding-window-maximum/)
+
+Using **priority_queue** and **pair<int,int>**.
+
+```c++
+class Solution {
+public:
+    vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+        priority_queue<pair<int, int> > pq;
+        vector<int> out;
+        for(int i = 0; i < k; i++) {
+            pq.push(make_pair(nums[i],i));
+            
+        }
+        out.push_back(pq.top().first);
+        for(int i = k; i < nums.size(); i++){
+            pq.push(make_pair(nums[i],i));
+            while(true){
+                pair<int, int> top = pq.top();
+                if(top.second < (i-k+1)) {
+                    pq.pop();
+                } else {
+                    out.push_back(top.first);
+                    break;
+                }
+            } 
+        }
+        return out;
+    }
+};
+```
+
