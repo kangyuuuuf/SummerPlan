@@ -1116,3 +1116,35 @@ public:
 };
 ```
 
+#### [**853. Car Fleet**](https://leetcode.com/problems/car-fleet/)
+
+In this question, the current car could only catch up with the car fleet that has the closest car that is also closer to the target. Then, for each car, we just need to find the right car fleet to check. Since it depends on the position, we need a sorted vector with pairs to store all the information. After the vector is descending, we use a stack to get the last car fleet for the current iteration.
+
+```c++
+class Solution {
+public:
+    int carFleet(int target, vector<int>& position, vector<int>& speed) {
+        stack<pair<int,int>> a;
+        vector<pair<int,int>> b;
+        for(int i = 0; i < position.size(); i++) {
+            b.push_back({position[i],speed[i]});
+        }
+        sort(b.begin(),b.end(),greater<pair<int,int>>());
+        for(auto c : b) {
+            if(a.empty()){
+                a.push(c);
+                continue;
+            } else {
+                auto d = a.top();
+                if(((double)(target-d.first)/d.second) >= ((double)(target-c.first)/c.second)){
+                    continue;
+                } else {
+                    a.push(c);
+                }
+            }
+        }
+        return a.size();
+    }
+};
+```
+
