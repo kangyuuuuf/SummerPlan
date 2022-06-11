@@ -914,3 +914,205 @@ public:
 };
 ```
 
+## Stack
+
+Stacks are a type of container adaptors with **LIFO**(Last In First Out) type of working, where a new element is added at one end (top) and an element is removed from that end only.
+
+#### [**20. Valid Parentheses**](https://leetcode.com/problems/valid-parentheses/)
+
+We can divide chars in the string into 2 parts: “(, {, [” and “), }, ]”. When we iterate the first part, we add the element to the stack. When we iterate the second part, we check the top of the stack. If it is not the same group of parentheses, return false. Also, we need to check whether the stack is empty to make sure the action of pop/top is valid.
+
+```c++
+class Solution {
+public:
+    bool isValid(string s) {
+        stack<char> a;
+        for(auto b : s) {
+            if(b == '(' || b == '[' || b == '{') {
+                a.push(b);
+            } else {
+                if(a.empty()) return false;
+                if(b == ')') {
+                    if(a.top() != '(') {
+                        return false;
+                    }
+                } else if(b == ']') {
+                    if(a.top() != '[') {
+                        return false;
+                    }
+                } else {
+                    if(a.top() != '{') {
+                        return false;
+                    }
+                }
+                a.pop();
+            }
+        }
+        if(!a.empty()) return false;
+        return true;
+    }
+};
+```
+
+#### [**155. Min Stack**](https://leetcode.com/problems/min-stack/)
+
+In this question, we need to implement all the functions and constructors in constant time. Most of the implementations can use an in-built **stack** to build. However, we need to handle the relation between **pop** and **getMin**. The max element will be removed when we called **pop**, and it is unrealistic that we find the second large element in the stack. Therefore, we need to use another stack to record the largest element for each iteration.  When the current max element is popped, we also pop the second stack and check the top. The current top will be the second-largest element that existed in the stack.
+
+```c++
+class MinStack {
+public:
+    MinStack() {
+       b.push(INT_MAX); 
+    }
+    
+    void push(int val) {
+        a.push(val);
+        if(val <= m) {
+            m = val;
+            b.push(m);
+        }
+    }
+    
+    void pop() {
+        if(a.top() == b.top()) {
+            b.pop();
+            m = b.top();
+        }
+        a.pop();
+    }
+    
+    int top() {
+        return a.top();
+    }
+    
+    int getMin() {
+        return m;
+    }
+private:
+    stack<int> a;
+    stack<int> b;
+    int m = INT_MAX;
+};
+```
+
+#### [**150. Evaluate Reverse Polish Notation**](https://leetcode.com/problems/evaluate-reverse-polish-notation/)
+
+Simple stack question.
+
+```c++
+class Solution {
+public:
+    int evalRPN(vector<string>& tokens) {
+        stack<int> b;
+        for(auto a : tokens) {
+            if(a == "+") {
+                int s = b.top();
+                b.pop();
+                int f = b.top();
+                b.pop();
+                b.push(f+s);
+            } else if(a == "-") {
+                int s = b.top();
+                b.pop();
+                int f = b.top();
+                b.pop();
+                b.push(f-s);
+            } else if(a == "*") {
+                int s = b.top();
+                b.pop();
+                int f = b.top();
+                b.pop();
+                b.push(f*s);
+            } else if(a == "/") {
+                int s = b.top();
+                b.pop();
+                int f = b.top();
+                b.pop();
+                b.push(f/s);
+            } else {
+                b.push(stoi(a));
+            }
+        }
+        return b.top();
+    }
+};
+```
+
+#### [**22. Generate Parentheses**](https://leetcode.com/problems/generate-parentheses/) (Solved by Recursion)
+
+In this question, we need to follow the basic rule to create a valid parenthesis.
+
+- The number of “(” must be larger or equal to the number of “)”.
+
+Since the variety of the string is not linear (string can add “(” or “)” when the above condition is true), we choose to use recursion.
+
+```
+class Solution {
+public:
+    vector<string> generateParenthesis(int n) {
+        vector<string> out;
+        
+        help(out,"",0,0,n);
+        return out;
+    }
+    void help(vector<string> & out, string cur, int a, int b,int n) {
+        if(a == b) {
+            if(a == n) {
+                out.push_back(cur);
+                return;
+            }
+            help(out, cur + '(', a+1, b, n);
+        } else {
+            if(a < n) {
+                help(out, cur + '(', a+1, b, n);
+            }
+            help(out, cur + ')', a, b+1, n);
+        }
+        return;
+    }
+};
+```
+
+After we browsed the discussion website, we found that this method is called **Backtracking Algorithm**(The key words: find all the possible solutions). A backtracking algorithm is a problem-solving algorithm that uses a **brute force approach** for finding the desired output. The term backtracking suggests that if the current solution is not suitable, then backtrack and try other solutions. Thus, recursion is used in this approach. This approach is used to solve problems that have multiple solutions. Here is the algorithm:
+
+```pseudocode
+Backtrack(x)
+    if x is not a solution
+        return false
+    if x is a new solution
+        add to list of solutions
+    backtrack(expand x)
+```
+
+#### [**739. Daily Temperatures**](https://leetcode.com/problems/daily-temperatures/)(Solved by Priority_queue)
+
+Due to the feature of priority_queue, we can find the day that has a colder temperature in the previous compared to the current temperature. 
+
+```c++
+class Solution {
+public:
+    vector<int> dailyTemperatures(vector<int>& temperatures) {
+        priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>> > pq;
+        vector<int> out(temperatures.size());
+        for(int i = 0; i < temperatures.size(); i++) {
+            while(!pq.empty()) {
+                auto a = pq.top();
+                if(a.first < temperatures[i]) {
+                    out[a.second] = i - a.second;
+                    pq.pop();
+                } else {
+                    break;
+                }
+            }
+            pq.push(make_pair(temperatures[i],i));
+        }
+        while(!pq.empty()) {
+            auto a = pq.top();
+            out[a.second] = 0;
+            pq.pop();             
+        }
+        return out;
+    }
+};
+```
+
