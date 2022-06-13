@@ -1116,6 +1116,24 @@ public:
 };
 ```
 
+We found that it is the subquestion of **Question 84**. Let’s try to solve it with the stack.
+
+```c++
+class Solution {
+public:
+    vector<int> dailyTemperatures(vector<int>& temperatures) {
+        stack<int> a;
+        vector<int> out(temperatures.size());
+        for(int i = temperatures.size()-1; i >= 0 ; i--) {
+            while(!a.empty() && temperatures[a.top()] <= temperatures[i]) a.pop();
+            out[i] = a.empty()? 0:a.top()-i;
+            a.push(i);
+        }
+        return out;
+    }
+};
+```
+
 #### [**853. Car Fleet**](https://leetcode.com/problems/car-fleet/)
 
 In this question, the current car could only catch up with the car fleet that has the closest car that is also closer to the target. Then, for each car, we just need to find the right car fleet to check. Since it depends on the position, we need a sorted vector with pairs to store all the information. After the vector is descending, we use a stack to get the last car fleet for the current iteration.
@@ -1144,6 +1162,49 @@ public:
             }
         }
         return a.size();
+    }
+};
+```
+
+#### [**84. Largest Rectangle in Histogram**](https://leetcode.com/problems/largest-rectangle-in-histogram/)(Unable to Solve)
+
+The solution is from the discussion. It follows the basic rule: for each element, find the position of the nearest smaller element on the right and left. Then, we will get two vectors to show the width of the rectangle that can make for the current height. Finally, we just need to iterate all the elements to find the max area.
+
+```c++
+class Solution {
+public:
+    vector<int> left(vector<int> & a) {
+        stack<int> b;
+        vector<int> out(a.size());
+        for(int i = 0; i < a.size(); i++) {
+            while(!b.empty() && a[i] <= a[b.top()]) b.pop();
+            
+            int top=(b.empty())?-1:b.top();
+            out[i] = top;
+            b.push(i);
+        }
+        return out;
+    }
+    vector<int> right(vector<int> & a) {
+        stack<int> b;
+        vector<int> out(a.size());
+        for(int i = a.size()-1; i >= 0; i--) {
+            while(!b.empty() && a[i] <= a[b.top()]) b.pop();
+            
+            int top=(b.empty())?a.size():b.top();
+            out[i] = top;
+            b.push(i);
+        }
+        return out;
+    }
+    int largestRectangleArea(vector<int>& heights) {
+        vector<int> a = left(heights);
+        vector<int> b = right(heights);
+        int out = 0;
+        for(int i = 0; i < heights.size(); i++) {
+            out = max(out,heights[i] * (b[i] - a[i] -1));
+        }
+        return out;
     }
 };
 ```
