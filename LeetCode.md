@@ -1209,3 +1209,224 @@ public:
 };
 ```
 
+## Binary Search
+
+Binary Search can be used in a sorted vector/array. For each iteration, we will choose the middle of the scope to check. If it is larger than the target, the scope changes from the middle to the end. If it is smaller than the target, the scope changes from the beginning to the middle. The time cost of Binary Search is $O(\log n)$.
+
+#### [**704. Binary Search**](https://leetcode.com/problems/binary-search/)
+
+Basic Binary Search.
+
+```c++
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        int l = 0;
+        int r = nums.size() -1;
+        while(r >= l){
+          	int idx = (r+l)/2;
+            if(nums[idx] > target) {
+                r = idx - 1;
+            } else if(nums[idx] < target) {
+                l = idx + 1;
+            } else {
+                return idx;
+            }
+        }
+        return -1;
+    }
+};
+```
+
+#### [**74. Search a 2D Matrix**](https://leetcode.com/problems/search-a-2d-matrix/)
+
+It is just a 2D Binary Search. My original solution is not ideal since I need to check the boundary separately. In the new answer, I handle the change of boundary, making it more effective.
+
+```c++
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        int n = matrix.size();
+        int m = matrix[0].size();
+        int cell = 0;
+        int floor = n - 1;
+        while(floor >=cell) {
+            int idxy = (floor + cell)/2;
+            if(matrix[idxy][m-1] < target ) {
+                cell = idxy +1;
+            } else if(matrix[idxy][0] > target) {
+                floor = idxy-1;
+            } else {
+                return search(matrix[idxy],target);
+            }
+        }
+        return false;
+    }
+    bool search(vector<int>& nums, int target) {
+        int idx = nums.size()/2;
+        int l = 0;
+        int r = nums.size() -1;
+        while(r-l > 1){
+            if(nums[idx] > target) {
+                r = idx;
+                idx = (idx+l)/2;
+            } else if(nums[idx] < target) {
+                l = idx;
+                idx = (idx+r)/2;
+            } else {
+                return true;
+            }
+        }
+        if(nums[r] == target) return true;
+        if(nums[l] == target) return true;
+        return false;
+    }
+};
+```
+
+#### [**875. Koko Eating Bananas**](https://leetcode.com/problems/koko-eating-bananas/)
+
+Let's consider in what situation we need to use the binary search: Given a sorted array. In this question, the vector is not sorted. However, we do not need to find the answer within the given vector. We need to find the smallest speed of eating given the amount of banana. Then, we can infer that the speed is $0<x\leq\max$. Within this scope, all the elements are possible, and it is sorted. Therefore, we can utilize the binary search.
+
+```c++
+class Solution {
+public:
+    int minEatingSpeed(vector<int>& piles, int h) {
+        int l = 1;
+        int r = *max_element(piles.begin(), piles.end());
+        while(r > l) {
+            int mid = (r+l)/2;
+            cout<<l << " " << r << endl;
+            if(check(piles,mid,h)){
+                r = mid;
+            } else {
+                l = mid+1;
+            }
+        }
+        return r;
+    }
+    bool check(vector<int>& a, int speed, int h) {
+        int timecost = 0;
+        for(auto & b : a) {
+            timecost+= b/speed + (b % speed != 0);
+        }
+        return timecost <= h;
+    }
+};
+```
+
+#### [**33. Search Rotated Sorted Array**](https://leetcode.com/problems/search-in-rotated-sorted-array/)
+
+There are two steps of this question: 
+
+1. Find the rotation index
+2. Binary Search
+
+```c++
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        int maxElementIndex = std::max_element(nums.begin(),nums.end()) - nums.begin();
+        int index = nums.size() - 1 - maxElementIndex;
+        int l = 0;
+        int r = nums.size() - 1;
+        while(r >= l) {
+            int mid = (r+l)/2;
+            int currentidx = changeidx(mid, maxElementIndex, index);
+            if(nums[currentidx] > target) {
+                r = mid - 1;
+            } else if (nums[currentidx] < target) {
+                l = mid + 1;    
+            } else {
+                return currentidx;
+            }
+        }
+        return -1;
+    }
+    int changeidx(int & idx, int & maxElementIndex,int & index) { 
+            if(idx >= index) return idx - index;
+            else return idx + maxElementIndex + 1;
+    }
+};
+```
+
+#### [**153. Find Minimum in Rotated Sorted Array**](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/)
+
+In this question, we need to check when does the boundary need to change given a rotated sorted array. When we know that the mid element is within the scope of both sides of the element, the left side is the min element. 
+
+``` c++
+class Solution {
+public:
+    int findMin(vector<int>& nums) {
+        int l = 0;
+        int r = nums.size()-1;
+        while(r >= l) {
+            int mid = (r+l)/2;
+            if(check(nums, mid, r, l)){
+                return nums[l];
+            }
+        } 
+        return nums[0];
+    }
+    bool check(vector<int>& nums, int & idx, int & r, int & l) {
+        if(nums[idx] >= nums[l] && nums[idx] > nums[r]) {
+            l = idx + 1;
+        } else if(nums[idx] >= nums[l] && nums[idx] <= nums[r]) {
+            return true;
+        } else if (nums[idx] <= nums[l] && nums[idx] < nums[r]) {
+            r = idx;
+        }
+        return false;
+    }
+};
+```
+
+#### [**981. Time Based Key-Value Store**](https://leetcode.com/problems/time-based-key-value-store/)
+
+Remember the timestamp is ascending, it means the vector we push_back is always sorted. This means we can use binary search.
+
+```c++
+class TimeMap {
+public:
+    TimeMap() {
+        
+    }
+    
+    void set(string key, string value, int timestamp) {
+        a[key].push_back({timestamp,value});
+    }
+    
+    string get(string key, int timestamp) {
+        if(a.find(key) == a.end()) {
+            return "";
+        }
+        int idx = search(a[key],timestamp);
+        if(idx == -1) return "";
+        return a[key][idx].second;
+    }
+private:
+    unordered_map<string,vector<pair<int, string>>> a;
+    int search(vector<pair<int, string>> & nums, int target) {
+        int l = 0;
+        int r = nums.size() -1;
+        while(r >= l){
+          	int idx = (r+l)/2;
+            if(nums[idx].first > target) {
+                r = idx - 1;
+            } else if(nums[idx].first < target) {
+                l = idx + 1;
+            } else {
+                return idx;
+            }
+            if(r < l) {
+                if(idx == 0 && nums[idx].first > target) return -1;
+                if( nums[idx].first > target) return idx-1;
+                return idx;
+            }
+        }
+        return l;
+    }
+    
+};
+```
+
