@@ -1753,7 +1753,7 @@ public:
 
 To solve this question, we need to know what is LRU cache. LRU cache is a limited container to store data. When the container is full, it will delete the least recently used element and add the new element to the cache. Note that both **get** and **put** will affect the time of use.
 
-Since we need to have average $O(1)$ cost time for **put** and **get**, we can use unordered_map to achieve that. We also need to modify the LRU infor each time when **put** and **get** are called, double linked list can help us to modified the LRU in constant time.
+Since we need to have average $O(1)$ cost time for **put** and **get**, we can use unordered_map to achieve that. We also need to modify the LRU infor each time when **put** and **get** are called, double linked list can help us to modify the LRU in constant time.
 
 - When we call **get**, we check whether the key exists in the map.
   - if it exists, modify the node of value in the list and return the node value
