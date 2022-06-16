@@ -1888,3 +1888,48 @@ public:
 };
 ```
 
+#### [**206. Reverse Nodes in K-Group**](https://leetcode.com/problems/reverse-nodes-in-k-group/)
+
+Reverse in K nodes as a group can be regarded as many Reverse Linked List questions. Therefore, we divided our solution into 2 parts:
+
+##### reverseList
+
+reverse the current group, return the end of the sublist
+
+##### **reverseKGroup**	
+
+find the subgroup end. If we hit the list end, return head. After we find the end node, store the next node of the end node as **NewHeadNode**, set the end node next be nullptr and call the **reverseList**. Then, the sublist in the front of **NewHeadNode** will be complete. Call the **reverseKGroup** with **NewHeadNode**. return the node of the head for the new sublist.
+
+```c++
+class Solution {
+public:
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        ListNode* curs = head;
+        ListNode* cure = curs;
+        int count = 1;
+        while(count < k && cure != nullptr) {
+            cure = cure -> next;
+            count++;
+        }
+        if(cure == nullptr) return head;
+        ListNode* news = cure -> next;
+        cure -> next = nullptr;
+        auto olde = reverseList(curs);
+        olde -> next = reverseKGroup(news,k);
+        return cure;
+    }
+    ListNode* reverseList(ListNode* head) {
+        if(head == nullptr) return nullptr;
+        ListNode* cur = head;
+        ListNode* last = nullptr;
+        while (cur != nullptr) {
+            ListNode* nex = cur->next;
+            cur->next = last;
+            last = cur;
+            cur = nex;
+        }
+        return head;
+    }
+};
+```
+

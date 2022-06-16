@@ -23,7 +23,7 @@ We are expecting **10** hours each week to focus on the leetcode. Given 5 weekda
 | Sliding Window  | (6/6)    | 6/10            |
 | Stack           | (7/7)    | 6/12            |
 | Binary Search   | (7/7)    | 6/15            |
-| Linked List     | (10/11)  |                 |
+| Linked List     | (11/11)  | 6/16            |
 |                 |          |                 |
 
 For the introduction of the Algorithm, we will meet twice a week, Tuesday and Thursday, to discuss the question in the book. Before each meeting, we need to finish the reading of the book. The meeting will last 3 hours.
