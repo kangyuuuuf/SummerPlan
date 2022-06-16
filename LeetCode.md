@@ -1933,3 +1933,235 @@ public:
 };
 ```
 
+#### [**226. Invert Binary Tree**](https://leetcode.com/problems/invert-binary-tree/)
+
+Mission Impossible: No Time to Do.
+
+```c++
+class Solution {
+public:
+    TreeNode* invertTree(TreeNode* root) {
+        if(root == nullptr) return nullptr;
+        TreeNode* l = root->left;
+        root -> left = root -> right;
+        root -> right = l;
+        invertTree(root->left);
+        invertTree(root->right);
+        return root;
+    }
+};
+```
+
+#### [**104. Maximum Depth of Binary Tree**](https://leetcode.com/problems/maximum-depth-of-binary-tree/)
+
+Avengers: Easygame.
+
+```c++
+class Solution {
+public:
+    int maxDepth(TreeNode* root) {
+        if(root == nullptr) return 0;
+        return 1 + max(maxDepth(root->left), maxDepth(root->right));
+    }
+};
+```
+
+#### [**543. Diameter of a Binary Tree**](https://leetcode.com/problems/diameter-of-binary-tree/)
+
+We try to calculate all the heights of left and right nodes to find the largest diameter. However, it is not effecient.
+
+```c++
+class Solution {
+public:
+    int diameterOfBinaryTree(TreeNode* root) {
+        if(root == nullptr) return 0;
+        return max(maxDepth(root->left) + maxDepth(root->right), max(diameterOfBinaryTree(root->left), diameterOfBinaryTree(root->right)));
+    }
+    int maxDepth(TreeNode* root) {
+        if(root == nullptr) return 0;
+        return 1 + max(maxDepth(root->left), maxDepth(root->right));
+    }
+};
+```
+
+In the following solution, max diameter is checked during the time of finding heigh, making the code more efficient.
+
+```c++
+class Solution {
+public:
+    int height(TreeNode* root, int& diameter)
+    {
+        if(root == NULL) return 0;
+        int lh = height(root->left, diameter);
+        int rh = height(root->right, diameter);
+        
+        diameter = max(diameter, rh+lh);
+        return 1+max(lh,rh);
+    }
+    
+    int diameterOfBinaryTree(TreeNode* root) {
+        int diameter = 0;
+        height(root, diameter);
+        return diameter;
+    }
+
+};
+```
+
+#### [**110. Balanced Binary Tree**](https://leetcode.com/problems/balanced-binary-tree/)
+
+Still an easy problem.
+
+```c++
+class Solution {
+public:
+    bool isBalanced(TreeNode* root) {
+        if(root == nullptr) return true;
+        if(abs(maxDepth(root -> left) - maxDepth(root -> right)) > 1) return false;
+        return true && isBalanced(root -> left) && isBalanced(root -> right);
+        
+    }
+    int maxDepth(TreeNode* root) {
+        if(root == nullptr) return 0;
+        return 1 + max(maxDepth(root->left), maxDepth(root->right));
+    }
+};
+```
+
+#### [**100. Same Tree**](https://leetcode.com/problems/same-tree/)
+
+Still an easy problem.
+
+```c++
+class Solution {
+public:
+    bool isSameTree(TreeNode* p, TreeNode* q) {
+        if(p == nullptr && q == nullptr) return true;
+        if((p != nullptr && q == nullptr) || (p == nullptr && q != nullptr)) return false;
+        if(p->val != q->val) return false;
+        return true && isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
+    }
+};
+```
+
+#### [**572. Subtree of Another Tree**](https://leetcode.com/problems/subtree-of-another-tree/)
+
+Still an easy problem.
+
+```c++
+class Solution {
+public:
+    bool isSubtree(TreeNode* root, TreeNode* subRoot) {
+        if(root == nullptr) return false;
+        if(root -> val == subRoot -> val) return isSameTree(root, subRoot) || isSubtree(root -> left, subRoot) || isSubtree(root -> right, subRoot);
+        return isSubtree(root -> left, subRoot) || isSubtree(root -> right, subRoot);
+        
+    }
+    bool isSameTree(TreeNode* p, TreeNode* q) {
+        if(p == nullptr && q == nullptr) return true;
+        if((p != nullptr && q == nullptr) || (p == nullptr && q != nullptr)) return false;
+        if(p->val != q->val) return false;
+        return true && isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
+    }
+};
+```
+
+#### [**235. Lowest Common Ancestor of a BST**](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/)
+
+Still an easy problem.
+
+```c++
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if(p->val <= root -> val && q ->val >= root -> val) return root;
+        if(p->val >= root -> val && q ->val <= root -> val) return root;
+        if(p->val <= root -> val && q ->val <= root -> val) return lowestCommonAncestor(root->left, p,q);
+        if(p->val >= root -> val && q ->val >= root -> val) return lowestCommonAncestor(root->right, p,q);
+        return nullptr;
+    }
+};
+```
+
+#### [**102. Binary Tree Level Order Traversal**](https://leetcode.com/problems/binary-tree-level-order-traversal/)
+
+In this question, we use a combination of vector and recursion to create a fake level order traversal. However, it is not efficient.
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int>> out;
+        help(root, 0, out);
+        return out;
+    }
+    void help(TreeNode* root, int height, vector<vector<int>> & out){
+        if(root == nullptr) return;
+        if(out.size() == height) {
+            out.push_back(vector<int>());
+        }
+        out[height].push_back(root->val);
+        help(root->left, height + 1, out);
+        help(root->right, height + 1, out);
+        
+    }
+};
+```
+
+Let’s try to solve it using the **queue**. Since it is level order, we need to check the root first then its children. The queue can achieve that since of course we will push root and then its children. The other problem is the node’s height. We know that the corresponding index in the vector depends on the node’s height. To solve it, we choose to use a double loop: the first loop is for the different levels, and the second is for the nodes in the same level. For each time in the first loop, the size of the queue is the number of nodes in the current level.
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int>> out;
+        if(root == nullptr) return out;
+        queue<TreeNode*> q;
+        q.push(root);
+        while(!q.empty()) {
+            int n = q.size();
+            vector<int> curlevel;
+            for(int i = 0; i < n; i++) {
+                auto a = q.front();
+                q.pop();
+                curlevel.push_back(a->val);
+                if(a->left != nullptr) q.push(a->left);
+                if(a->right != nullptr) q.push(a->right);
+            }
+            out.push_back(curlevel);
+        }
+        return out;
+    }
+};
+```
+
+#### [**199. Binary Tree Right Side View**](https://leetcode.com/problems/binary-tree-right-side-view/)
+
+Just like the last question, we used the queue to find the right view element(the rightest one in the current height).
+
+```c++
+class Solution {
+public:
+    vector<int> rightSideView(TreeNode* root) {
+        vector<int> out;
+        if(root == nullptr) return out;
+        queue<TreeNode*> q;
+        q.push(root);
+        while(!q.empty()){
+            int n = q.size();
+            for(int i = 0; i < n-1; i++) {
+                if(q.front() -> left != nullptr) q.push(q.front() -> left);
+                if(q.front() -> right != nullptr) q.push(q.front() -> right);
+                q.pop();
+            }
+            TreeNode * cur = q.front();
+            if(q.front() -> left != nullptr) q.push(q.front() -> left);
+            if(q.front() -> right != nullptr) q.push(q.front() -> right);
+            q.pop();
+            out.push_back(cur->val);
+        }
+        return out;
+    }
+};
+```
+
