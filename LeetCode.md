@@ -1846,5 +1846,45 @@ public:
 };
 ```
 
+#### [**23. Merge K Sorted Lists**](https://leetcode.com/problems/merge-k-sorted-lists/)
 
+Have no idea why is a hard question.
+
+```c++
+class Solution {
+public:
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        bool chead = true;
+        ListNode* head = nullptr;
+        ListNode* cur;
+        while (true) {
+            int idx = 0;
+            int max = INT_MAX;
+            ListNode*  node = nullptr;
+            for(int i = 0; i < lists.size(); i++) {
+                if(lists[i] == nullptr){
+                    continue;
+                }
+                if(lists[i]-> val < max) {
+                    max = lists[i] -> val;
+                    node = lists[i];
+                    idx = i;
+                }  
+            }
+            if(node == nullptr) break;
+            else {
+                if(chead) {
+                    head = cur = node;
+                    chead = false;
+                } else {
+                    cur -> next = node;
+                    cur = cur -> next;
+                }
+                lists[idx] = lists[idx]->next;  
+            }
+        }
+        return head;
+    }
+};
+```
 
