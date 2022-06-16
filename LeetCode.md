@@ -1430,3 +1430,421 @@ private:
 };
 ```
 
+#### [**4. Find Median of Two Sorted Arrays**](https://leetcode.com/problems/median-of-two-sorted-arrays/)(Unable to Solve)
+
+No idea about this question. Here is a c++ solution from the discussion.
+
+```c++
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        int m = nums1.size();
+        int n = nums2.size();
+        if (m == 0 && n == 1) return (double) nums2[0];
+        if (m == 1 && n == 0) return (double) nums1[0];
+        
+        int target = (m + n - 1) / 2;  
+        int left = target - n > -1 ? target - n : -1;
+        int right = target < m - 1 ? target : m - 1;
+        int p1l;    //element at the left of the bar in nums1
+        int p2l;    //element at the left of the bar in nums2
+        int p1r;    //element at the right of the bar in nums1
+        int p2r;    //element at the right of the bar in nums2
+        
+        while (left <= right) {
+            int mid = left + (right - left) / 2;    //index in nums1
+            int idx = target - mid - 1;    //corresponding index in nums2
+            if (mid > -1) p1l = nums1[mid];
+            else p1l = nums2[idx];
+            if (idx > -1) p2l = nums2[idx];
+            else p2l = nums1[mid];
+            if (mid < m - 1) p1r = nums1[mid + 1];
+            else p1r = nums2[idx + 1];
+            if (idx < n - 1) p2r = nums2[idx + 1];
+            else p2r = nums1[mid + 1];
+            
+            if (p1r < p2l) {
+                left = mid + 1;
+            }
+            else if (p1l > p2r) {
+                right = mid - 1;
+            }
+            else {
+                break;
+            }
+        }
+        
+        if ((m + n) % 2 != 0) {
+            return (double) (p1l > p2l ? p1l : p2l);
+        }
+        else {
+            int pl = p1l > p2l ? p1l : p2l;
+            int pr = p1r < p2r ? p1r : p2r;
+            return (double) (pl + pr) / 2;
+        }
+    }
+};
+```
+
+## Linked List
+
+#### [**206. Reverse Linked List**](https://leetcode.com/problems/reverse-linked-list/)
+
+Simple reverse question.
+
+```c++
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+        if(head == nullptr) return nullptr;
+        ListNode* cur = head;
+        ListNode* last = nullptr;
+        while (cur != nullptr) {
+            ListNode* nex = cur->next;
+            cur->next = last;
+            last = cur;
+            cur = nex;
+        }
+        return last;
+    }
+};
+```
+
+#### [**21. Merge Two Linked Lists**](https://leetcode.com/problems/merge-two-sorted-lists/)
+
+Simple Recursion Solution.
+
+```c++
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+        if(list1 == nullptr && list2 == nullptr) return nullptr;
+        else if (list1 == nullptr) return list2;
+        else if (list2 == nullptr) return list1;
+        if(list1 -> val > list2 -> val) {
+            list2->next = mergeTwoLists(list1, list2->next);
+            return list2;
+        } else {
+            list1->next = mergeTwoLists(list2, list1->next);
+            return list1;
+        }
+    }
+};
+```
+
+#### [**143. Reorder List**](https://leetcode.com/problems/reorder-list/)
+
+In this question, we need to get the element from the back of the list. The stack will help us to do that. Also, we need to handle the termination when the element is ended.
+
+```c++
+class Solution {
+public:
+    void reorderList(ListNode* head) {
+        if(head == nullptr) return;
+        ListNode * l = head;
+        stack<ListNode *> s;
+        while(l != nullptr) {
+            s.push(l);
+            l = l -> next;
+        }
+        int n = s.size();
+        ListNode* cur = head;
+        ListNode* nex;
+        for(int i = 0; i < n/2; i++){
+            nex = cur->next;
+            cur -> next = s.top();
+            if(i == n/2-1 && n % 2 == 0) nex = nullptr;
+            if(i == n/2-1 && n % 2 != 0) nex -> next = nullptr;
+            cur->next->next = nex;
+            
+            cur = nex;
+            s.pop();
+        }
+        
+    }
+};
+```
+
+#### [**19. Remove Nth Node from End of List**](https://leetcode.com/problems/remove-nth-node-from-end-of-list/)
+
+Since it is a one-way linked list, we need one pass to count the size of the list. We could utilize the vector. The index of element is the position of element in the list.
+
+```c++
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        if(head == nullptr) return nullptr;
+        vector<ListNode*> check;
+        auto cur = head;
+        while(cur != nullptr) {
+            check.push_back(cur);
+            cur = cur -> next;
+        }
+        if(n == check.size()) return check.size() == 1 ? nullptr :check[1];
+        auto cha = check[check.size()-n];
+        auto last = check[check.size()-n-1];
+        last->next = cha -> next;
+        return check[0];
+    }
+    
+};
+```
+
+#### [**138. Copy List with Random Pointer**](https://leetcode.com/problems/copy-list-with-random-pointer/)
+
+We use unordered_map to store the according pointer for the copy list and new list. Then, when we do the deep copy for the random pointers, we can easily find the right point through map.
+
+```c++
+class Solution {
+public:
+    Node* copyRandomList(Node* head) {
+        if(head == nullptr) return nullptr;
+        unordered_map<Node*, Node*> check;
+        Node* out = new Node(head -> val);
+        check[head] = out;
+        Node* cur = out;
+        Node* cur2 = head -> next;
+        while(cur2 != nullptr){
+            cur -> next = new Node(cur2 -> val);
+            cur = cur -> next;
+            check[cur2] = cur;
+            cur2 = cur2 -> next;
+        }
+        cur = out;
+        cur2 = head;
+        while(cur != nullptr) {
+            cur->random = check[cur2 -> random];
+            cur = cur -> next;
+            cur2 = cur2 -> next;
+        }
+        return out;
+    }
+};
+```
+
+#### [**2. Add Two Numbers**](https://leetcode.com/problems/add-two-numbers/)
+
+Remember to handle the situation when the sum of two nodes is larger than 10. Do not sum each linked list number because it will be out of bound.
+
+```c++
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        bool add1 = false;
+        int sum = l1->val+l2->val;
+        if(sum >= 10) {
+            sum -= 10;
+            add1 = true;
+        }
+        ListNode* out = new ListNode(sum);
+        auto cur = out;
+        l1 = l1 -> next;
+        l2 = l2 -> next;
+        while(l1 != nullptr &&  l2 != nullptr) {
+            sum  = l1->val+l2->val + add1;
+            if(sum >= 10) {
+                sum -= 10;
+                add1 = true;
+            }else {
+                add1 = false;
+            }
+            cur -> next = new ListNode(sum);
+            cur = cur -> next;
+            l1 = l1 -> next;
+            l2 = l2 -> next;
+        }
+        while(l1 != nullptr) {
+            sum = l1 -> val + add1;
+            if(sum >= 10) {
+                sum -= 10;
+                add1 = true;
+            }else {
+                add1 = false;
+            }
+            cur -> next = new ListNode(sum);
+            cur = cur -> next;
+            l1 = l1 -> next;
+        } 
+        while (l2 != nullptr) {
+            sum = l2 -> val + add1;
+            if(sum >= 10) {
+                sum -= 10;
+                add1 = true;
+            } else {
+                add1 = false;
+            }
+            cur -> next = new ListNode(sum);
+            cur = cur -> next;
+            l2 = l2 -> next;
+        }
+        if(add1) {
+            cur -> next = new ListNode(1);
+        }
+        return out;
+    }
+};
+```
+
+#### [**141. Linked List Cycle**](https://leetcode.com/problems/linked-list-cycle/)
+
+Use a vector to store the passed pointers. It is not efficient but passed.
+
+```c++
+class Solution {
+public:
+    bool hasCycle(ListNode *head) {
+        vector<ListNode*> check;
+        while(head != nullptr) {
+            auto it = find (check.begin(), check.end(), head);
+            if (it != check.end()) {
+                return true;
+            }
+            check.push_back(head);
+            head = head -> next;
+        }
+        return false;
+    }
+};
+```
+
+#### [**287. Find the Duplicate Number**](https://leetcode.com/problems/find-the-duplicate-number/)
+
+Using the same way in **Question 217**, we can get the solution. However, it is not efficient.
+
+```c++
+class Solution {
+public:
+    int findDuplicate(vector<int>& nums) {
+        std::set<int> check;
+        for(int i = 0; i < nums.size(); i++){
+            if(check.count(nums[i])){
+                return nums[i];
+            }
+            check.insert(nums[i]);
+        }
+        return 0;
+    }
+};
+```
+
+Here is another solution from the discussion. Since the question is told iven an array of integers `nums` containing $n + 1 $integers where each integer is in the range$ [1, n]$ inclusive, we can know that each num can represent an index and the index can only appear once except for the duplicate number. The duplicate number will cause a **cycle**:
+
+![image](LeetCode.assets/264fedec-9358-4237-ad1d-571cac4b5286_1655149613.9240441-20220615170858496.png)
+
+```c++
+class Solution {
+public:
+    int findDuplicate(vector<int>& nums) {
+        vector<bool> check(nums.size(),false);
+        for(int i = 0; i < nums.size(); i++) {
+            if(check[nums[i]]){
+                return nums[i];
+            } else {
+                check[nums[i]] = true;
+            }
+        }
+        return true;
+        
+    }
+}
+```
+
+#### [**146. LRU Cache**](https://leetcode.com/problems/lru-cache/)
+
+To solve this question, we need to know what is LRU cache. LRU cache is a limited container to store data. When the container is full, it will delete the least recently used element and add the new element to the cache. Note that both **get** and **put** will affect the time of use.
+
+Since we need to have average $O(1)$ cost time for **put** and **get**, we can use unordered_map to achieve that. We also need to modify the LRU infor each time when **put** and **get** are called, double linked list can help us to modified the LRU in constant time.
+
+- When we call **get**, we check whether the key exists in the map.
+  - if it exists, modify the node of value in the list and return the node value
+    - if it is the **head**, do not need to modify
+    - if it is the **end**, put the node in front of the list and update the new end.
+    - if it is between the **head** and **end**, put the node in front of the list.
+  - If it does not exist, return -1.
+- When we call **put**, we check whether the key exists in the map.
+  - if it exists, update the LRU and map value
+  - if it does not exist, increase size by 1
+    - if the size equals 1, let **head** and **end** be the new node.
+    - if the size is larger then 1 and less then capacity, add the node in front of list
+    - if the size is larger than capacity, remove the in the **end** and erase the corresponding pair in the map and add the node in front of the list
+
+```c++
+class LRUCache {
+public:
+    struct ListNode {
+        int key;
+        int val;
+        ListNode *next;
+        ListNode *last;
+        ListNode() : key(0), val(0), next(nullptr) {}
+        ListNode(int  y, int x) : key(y), val(x), next(nullptr) {}
+        ListNode(int x, ListNode *next) : key(0), val(x), next(next) {}
+    };
+    
+    LRUCache(int capacity) {
+        capa = capacity;
+    }
+    
+    int get(int key) {
+        if(data.find(key) != data.end()) {
+            if(data[key] != head) {
+                data[key] -> last -> next = data[key] -> next;
+                if(data[key] != end) data[key] -> next -> last = data[key] -> last;
+                else end = data[key] -> last;
+                data[key] -> next = head;
+                data[key] -> last = nullptr;
+                head -> last = data[key];
+                head = data[key];
+            }
+            return data[key] -> val;
+        }
+        return -1;
+    }
+    
+    void put(int key, int value) {
+        if(data.find(key) != data.end()) {
+            data[key] -> val = value;
+            if(data[key] != head) {
+                data[key] -> last -> next = data[key] -> next;
+                if(data[key] != end) data[key] -> next -> last = data[key] -> last;
+                else end = data[key] -> last;
+                data[key] -> next = head;
+                data[key] -> last = nullptr;
+                head -> last = data[key];
+                head = data[key];
+            }
+            //update;
+        } else {
+            size++;
+            if(size == 1) {
+                head = end = new ListNode(key,value);
+            } else if(size <= capa) {
+                head -> last = new ListNode(key,value);
+                head -> last -> next = head;
+                head = head -> last;
+            } else {
+                auto add =  new ListNode(key,value);
+                add -> next = head;
+                head -> last = add;
+                head = add;
+                end = end -> last;
+                data.erase(end -> next -> key);
+                delete end ->next;
+                end -> next = nullptr;
+            }
+            data[key] = head;
+        }
+    }
+    
+    unordered_map<int,ListNode*> data;
+    int size = 0;
+    int capa;
+    ListNode* head = nullptr;
+    ListNode* end = nullptr;
+    
+    
+};
+```
+
+
+
