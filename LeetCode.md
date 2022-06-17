@@ -1933,6 +1933,8 @@ public:
 };
 ```
 
+## Trees
+
 #### [**226. Invert Binary Tree**](https://leetcode.com/problems/invert-binary-tree/)
 
 Mission Impossible: No Time to Do.
@@ -2163,5 +2165,209 @@ public:
         return out;
     }
 };
+```
+
+#### [**1448. Count Good Nodes in a Binary Tree**](https://leetcode.com/problems/count-good-nodes-in-binary-tree/)
+
+Still an easy problem.
+
+```c++
+class Solution {
+public:
+    int goodNodes(TreeNode* root) {
+        if(root == nullptr) return 0;
+        return 1 + goodNodes(root->left, root->val) + goodNodes(root->right, root->val);
+    }
+    int goodNodes(TreeNode * cur, int max){
+        if(cur == nullptr) return 0;
+        if(cur->val >= max){
+            return 1 + goodNodes(cur->left, cur->val) + goodNodes(cur->right, cur->val);
+        } else {
+            return goodNodes(cur->left, max) + goodNodes(cur->right, max);
+        }
+    }
+};
+```
+
+#### [**98. Validate Binary Search Tree**](https://leetcode.com/problems/validate-binary-search-tree/)
+
+It is a simple problem if we do not consider the edge case where the element is INT_MAX or INT_MIN.  If we do need to handle the edge case, I add to variable to check there is appearance of INT_MAX or INT_MIN.
+
+```c++
+class Solution {
+public:
+    bool isValidBST(TreeNode* root) {
+        return isValidBST(root, INT_MIN, INT_MAX);
+    }
+    
+    bool isValidBST(TreeNode* cur, int min, int max) {
+        if(cur == nullptr) return true;
+        if(cur->val == min && cur->val == INT_MIN) {
+            if(!isMin) {
+                isMin = true;
+            } else {
+                return false;
+            }
+        } else if(cur->val == max && cur->val == INT_MAX) {
+            if(!isMax) {
+                isMax = true;
+            } else {
+                return false;
+            }
+        } else if(cur->val <= min || cur->val >= max) return false;
+        return isValidBST(cur -> left, min, cur -> val) && isValidBST(cur -> right, cur -> val, max);
+    }
+    bool isMin = false;
+    bool isMax = false;
+};
+```
+
+#### [**230. Kth Smallest Element in a BST**](https://leetcode.com/problems/kth-smallest-element-in-a-bst/)
+
+```c++
+class Solution {
+public:
+    int kthSmallest(TreeNode* root, int k) {
+        int a = 0;
+        int b = 0;
+        inorderT(root, a, k, b);
+        return b;
+    }
+    void inorderT(TreeNode* cur, int & count, int & k, int & ans) {
+        if(cur == nullptr) return;
+        if(count > k) return;
+        inorderT(cur->left,count,k, ans);
+        count++;
+        if(count == k){
+            ans = cur -> val;
+            return;
+        } 
+        inorderT(cur->right,count,k, ans);
+    }
+};
+```
+
+#### [**105. Construct Tree from Preorder and Inorder Traversal**](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)(Unable to Solve)
+
+This is a example from the discussion. Let’s make a example from the question:
+
+Preorder: [3,9,20,15,7]
+
+Inorder: [9,3,15,20,7]
+
+We set the scope of finding value between 0 and the end of the vector. And we can start:
+
+First, we use a loop to iterate the preorder vector. We know that 3 is the head of the tree. And we use **find** to get the index of the value in the inorder vector. Due to the feature of ignorer traversal, we know that the elements on the left of the index are in the left tree and the elements on the right of the index are in the right tree. We change the scope of finding value and we get:
+
+[9,**3**,15,20,7] where 9 is the left child. Since in the left hand of **element 3**, we only have 9, we can just return 9 without finding its children. When we try to find the right children, we get **element 20** in the preorder vector. 
+
+Then, do the recursion. We find the index of the element, checking the left and right-hand children. 
+
+```c++
+class Solution {
+public:
+    int i = 0;
+    
+    TreeNode* createTree(vector<int>& preorder, vector<int>& inorder,int start,int end)
+    {
+        if(start>end)
+            return NULL;
+        
+        TreeNode *a = new TreeNode(preorder[i++]);
+        if(start==end)
+            return a;
+        
+        int x = find(inorder.begin(),inorder.end(),a->val)-inorder.begin();
+        
+        a->left = createTree(preorder,inorder,start,x-1);
+        a->right = createTree(preorder,inorder,x+1,end);
+        return a;
+    }
+    
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        TreeNode *head;
+        head = createTree(preorder,inorder,0,preorder.size()-1);
+        return head;
+    }
+};
+```
+
+#### [**124. Binary Tree Max Path Sum**](https://leetcode.com/problems/binary-tree-maximum-path-sum/)
+
+We start the recursion from the bottom of the tree.
+
+- if the new val = max(val+right->val, val, val+left->val)
+- maxv = max(val+right->val, val, val+left->val, val+right->val+left->val)
+
+``` c++
+class Solution {
+public:
+    int maxPathSum(TreeNode* root) {
+        int max = INT_MIN;
+        help(root, max);
+        return max;
+    }
+    void help(TreeNode* root, int & maxv) {
+        if(root->left != nullptr) help(root->left, maxv);
+        if(root->right != nullptr) help(root->right, maxv);
+        
+        if(root->left == nullptr && root->right == nullptr){
+            if(root->val > maxv){
+                maxv = root->val;
+            }
+        }
+        else if(root->right != nullptr && root->left == nullptr){
+            root->val = max(root->val+root->right->val, root->val);
+        } else if(root->right == nullptr && root->left != nullptr) {
+            root->val = max(root->val+root->left->val, root->val);
+        } else {
+            if(maxv < root->val + root->left->val + root->right->val) {
+                maxv = root->val + root->left->val + root->right->val;
+            }
+             root->val = max(root->val+max(root->left->val,root->right->val), root->val);
+        }
+        if(root->val > maxv) {
+            maxv = root->val;
+        }
+    }
+};
+```
+
+#### [**297. Serialize and Deserialize Binary Tree**](https://leetcode.com/problems/serialize-and-deserialize-binary-tree/)
+
+We use preorder traverse to serialize the given tree and use “!” to show the position of nullptr. And we deserialize the string using recursion.
+
+```c++
+class Codec {
+public:
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        if(root == nullptr) return "!";
+        return to_string(root->val) + "|" + serialize(root->left) +"|" + serialize(root->right);
+    }
+    
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        size_t idx = 0;
+        return deserialize(data, idx);
+    }
+    TreeNode* deserialize(string data, size_t & idx) {
+        auto found = data.find("|", idx);
+        if(found == string::npos) {
+            found = data.length();
+        }
+        string add1 = data.substr(idx, found - idx);
+        idx = found + 1;
+        if(add1 == "!") return nullptr;
+        auto add = new TreeNode(stoi(add1));
+        idx = found + 1;
+        add -> left = deserialize(data, idx);
+        add -> right = deserialize(data, idx);
+        return add;
+    }
+    
+};
+
 ```
 
