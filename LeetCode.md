@@ -2371,3 +2371,224 @@ public:
 
 ```
 
+## Trie
+
+Trie is an efficient information retrieval data structure. Using Trie, search complexities can be brought to optimal limit (key length). If we store keys in a binary search tree, a well-balanced BST will need time proportional to **M \* log N**, where M is the maximum string length and N is the number of keys in the tree. Using Trie, we can search the key in O(M) time. However, the penalty is on Trie storage requirements 
+
+<img src="LeetCode.assets/Trie.png" alt="img" style="zoom:20%;" />
+
+#### [**208. Implement Trie**](https://leetcode.com/problems/implement-trie-prefix-tree/)
+
+```c++
+class Trie {
+public:
+    struct Node {
+        char val;
+        vector<Node*> child;
+        bool isend = false;
+        Node(char a) {
+            val = a;
+        }
+        Node() {}
+    };
+    Trie() {
+        root = new Node();
+    }
+    
+    void insert(string word) {
+        Node * cur = root;
+        for(auto a : word) {
+            int i = 0;
+            for(i; i < cur->child.size(); i++) {
+                if(cur->child[i]->val == a) break;
+            }
+            if(i != cur->child.size()) {
+                cur = cur->child[i];
+                continue;
+            } else {
+                cur->child.push_back(new Node(a));
+                cur = cur->child[cur->child.size()-1];
+            }
+        }
+        cur->isend = true;
+    }
+    
+    bool search(string word) {
+        Node* cur = root;
+        for(auto a : word) {
+            int i = 0;
+            for(i; i < cur->child.size(); i++) {
+                if(cur->child[i]->val == a) break;
+            }
+            if(i == cur->child.size()) return false;
+            cur = cur->child[i];
+        }
+        if(cur->isend) {
+            return true;
+        }
+        return false;
+    }
+    
+    bool startsWith(string prefix) {
+        Node* cur = root;
+        for(auto a : prefix) {
+            int i = 0;
+            for(i; i < cur->child.size(); i++) {
+                if(cur->child[i]->val == a) break;
+            }
+            if(i == cur->child.size()) return false;
+            cur = cur->child[i];
+        }
+        return true;
+    }
+    Node * root;
+};
+```
+
+#### [**211. Design Add and Search Word Data Structure**](https://leetcode.com/problems/design-add-and-search-words-data-structure/)
+
+Since the char is limited within the alphabet, we can map each letter to a number as an index. When the next char we need to search is “.”, we need to call all the nodes in the vector to search.
+
+```c++
+class WordDictionary {
+public:
+    WordDictionary() {
+        
+    }
+    
+    void addWord(string word) {
+        int idx = (int)(word[0] - 97);
+        if(child[idx] == nullptr) {
+            child[idx] = new WordDictionary();
+        }
+        if(word.length() == 1) {
+            child[idx]->isEnd = true;
+        } else {
+            child[idx]->addWord(word.substr(1));
+        }
+    }
+    
+    bool search(string word) {
+        return help(word, 0);
+    }
+    bool help(string & word, int idx) {
+        if (idx == word.size()){
+            if (isEnd){
+                return true; 
+            } else{
+                return false;
+            }
+        }
+        if (word[idx] == '.'){      
+            for (int c = 0; c < 26; c++){
+                if(child[c] != nullptr){
+                    if (child[c] -> help(word, idx+1)){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        if(child[word[idx]-'a'] != nullptr) {
+            return child[word[idx]-'a']->help(word, idx+1);
+        }
+        return false;
+        
+    }
+    vector<WordDictionary* > child = vector<WordDictionary* >(26,nullptr);
+    bool isEnd = false;
+};
+```
+
+## Heap/Priority_Queue
+
+#### [**703. Kth Largest Element in a Stream**](https://leetcode.com/problems/kth-largest-element-in-a-stream/)
+
+We know that we need to find the $k^{th}$ element, which means that the element after $k^{th}$ are meaningless. Using Priority_queue to sort the $k^{th}$ largest value and each time we add a new element, pop the front element in the queue.
+
+```c++
+class KthLargest {
+public:
+    KthLargest(int k, vector<int>& nums) {
+        pq = std::priority_queue<int, std::vector<int>, std::greater<int>>(nums.begin(), nums.end());
+        while(pq.size() > k) {
+            pq.pop();
+        }
+        num = k;
+    }
+    
+    int add(int val) {
+        if(pq.size() == num){
+            pq.push(val);
+            pq.pop();
+            return pq.top();
+        }
+        pq.push(val);
+        return pq.top();
+    }
+    std::priority_queue<int, std::vector<int>, std::greater<int>>
+        pq;
+    int num;
+};
+```
+
+#### [**1046. Last Stone Weight**](https://leetcode.com/problems/last-stone-weight/)
+
+Simple question.
+
+```c++
+class Solution {
+public:
+    int lastStoneWeight(vector<int>& stones) {
+        priority_queue<int> pq(stones.begin(), stones.end());
+        while(pq.size() > 1) {
+            int x = pq.top();
+            pq.pop();
+            int y = pq.top();
+            pq.pop();
+            if(x == y) continue;
+            else {
+                pq.push(max(x-y,y-x));
+            }
+        }
+        return pq.size() == 0 ? 0 : pq.top();
+    }
+};
+```
+
+#### [**973. K Closest Points to Origin**](https://leetcode.com/problems/k-closest-points-to-origin/)
+
+Simple question.
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> kClosest(vector<vector<int>>& points, int k) {
+         priority_queue<pair<int, vector<int>>, vector<pair<int, vector<int>>>, greater<pair<int, vector<int>>> > pq;
+        for(auto & a : points) {
+            pq.push(make_pair(a[0]*a[0] + a[1]*a[1], a));
+        }
+        vector<vector<int>> a;
+        for(int i = 0; i < k; i++) {
+            a.push_back(pq.top().second);
+            pq.pop();
+        }
+        return a;
+    }
+};
+```
+
+#### [**215. Kth Largest Element in an Array**](https://leetcode.com/problems/kth-largest-element-in-an-array/)
+
+Simple question.
+
+```c++
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        sort(begin(nums), end(nums));
+        return nums[nums.size()-k];
+    }
+};
+```
+
