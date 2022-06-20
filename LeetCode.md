@@ -2592,3 +2592,103 @@ public:
 };
 ```
 
+#### [**621. Task Scheduler**](https://leetcode.com/problems/task-scheduler/)(Unable to Solve)
+
+```c++
+class Solution {
+public:
+    int leastInterval(vector<char>& tasks, int n) {
+        vector<int> f(26);
+        int s=tasks.size();
+        for(int i=0;i<s;++i)
+            ++f[tasks[i]-'A'];
+        sort(f.begin(),f.end());
+        int max_gap=f[25]-1;
+        int hole=(max_gap) * n;
+        for(int i=24;i>=0;--i)
+            hole-=min(max_gap,f[i]);
+        return hole<0?s: s+hole;
+    }
+};
+```
+
+#### [**355. Design Twitter**](https://leetcode.com/problems/design-twitter/)
+
+In this question, we use map + vector. The map is used to store the friend relationship while the vector is the post. Larger index in the post means more recently the post sent.
+
+```c++
+class Twitter {
+public:
+    unordered_map<int,set<int>> friends;
+    vector<pair<int,int>> post;
+    Twitter() {
+        
+    }
+    
+    void postTweet(int userId, int tweetId) {
+        post.push_back({userId, tweetId});
+    }
+    
+    vector<int> getNewsFeed(int userId) {
+        vector<int> out;
+        int i = post.size()-1;
+        while(i != -1 && out.size() != 10) {
+            auto & a = post[i];
+            if(friends.find(userId) != friends.end()) {
+                if((friends[userId]).count(a.first)){
+                    out.push_back(a.second);
+                    i--;
+                    continue;
+                }
+            }
+            if(userId == a.first){
+                out.push_back(a.second);
+            }
+            i--;
+        }
+        return out;
+    }
+    
+    void follow(int followerId, int followeeId) {
+        friends[followerId].insert(followeeId);
+    }
+    
+    void unfollow(int followerId, int followeeId) {
+        friends[followerId].erase(followeeId);
+    }
+    
+};
+```
+
+#### [**295. Find Median from Data Stream**](https://leetcode.com/problems/find-median-from-data-stream/)
+
+We use 2 priority_queque to store the left side and right side of the data stream. We balance the size of the queue each time when we add an element. Then, we can get the median from the top of the two queues.
+
+```c++
+class MedianFinder {
+public:
+    priority_queue<int> left;
+    priority_queue<int, vector<int>, greater<int>> right; 
+    MedianFinder() {
+        
+    }
+    
+    void addNum(int num) {
+        if(left.size() == 0) left.push(num);
+        else if(num <= left.top()) left.push(num);
+        else right.push(num);
+        if(left.size() > 1 + right.size()) {
+            right.push(left.top());
+            left.pop();
+        } else if(right.size()  > left.size()) {
+            left.push(right.top());
+            right.pop();
+        }
+    }
+    
+    double findMedian() {
+        return left.size() == right.size() ? ((double)left.top() + (double)right.top())/2 : left.top();
+    }
+};
+```
+
