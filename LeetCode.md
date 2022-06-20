@@ -2502,6 +2502,8 @@ public:
 
 ## Heap/Priority_Queue
 
+A priority queue is a **special type of queue** in which each element is associated with a **priority value**. And, elements are served on the basis of their priority. That is, higher priority elements are served first.
+
 #### [**703. Kth Largest Element in a Stream**](https://leetcode.com/problems/kth-largest-element-in-a-stream/)
 
 We know that we need to find the $k^{th}$ element, which means that the element after $k^{th}$ are meaningless. Using Priority_queue to sort the $k^{th}$ largest value and each time we add a new element, pop the front element in the queue.
