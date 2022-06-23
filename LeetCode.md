@@ -1073,16 +1073,7 @@ public:
 };
 ```
 
-After we browsed the discussion website, we found that this method is called **Backtracking Algorithm**(The key words: find all the possible solutions). A backtracking algorithm is a problem-solving algorithm that uses a **brute force approach** for finding the desired output. The term backtracking suggests that if the current solution is not suitable, then backtrack and try other solutions. Thus, recursion is used in this approach. This approach is used to solve problems that have multiple solutions. Here is the algorithm:
-
-```pseudocode
-Backtrack(x)
-    if x is not a solution
-        return false
-    if x is a new solution
-        add to list of solutions
-    backtrack(expand x)
-```
+After we browsed the discussion website, we found that this method is called **Backtracking Algorithm**(The key words: find all the possible solutions). 
 
 #### [**739. Daily Temperatures**](https://leetcode.com/problems/daily-temperatures/)(Solved by Priority_queue)
 
@@ -2690,6 +2681,378 @@ public:
     
     double findMedian() {
         return left.size() == right.size() ? ((double)left.top() + (double)right.top())/2 : left.top();
+    }
+};
+```
+
+## Backtracking
+
+A backtracking algorithm is a problem-solving algorithm that uses a **brute force approach** for finding the desired output. The term backtracking suggests that if the current solution is not suitable, then backtrack and try other solutions. Thus, recursion is used in this approach. This approach is used to solve problems that have multiple solutions. Here is the algorithm:
+
+```pseudocode
+Backtrack(x)
+    if x is not a solution
+        return false
+    if x is a new solution
+        add to list of solutions
+    backtrack(expand x)
+```
+
+#### [**78. Subsets**](https://leetcode.com/problems/subsets/)
+
+The idea of this question is to iterate the vector. When we iterate a new index, we choose not to add the element of the current index or add the element. Firstly, adding the element for the first recursion. Then, we pop the element and call the second recursion.
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> subsets(vector<int>& nums) {
+        vector<vector<int>> ans;
+        vector<int> temp;
+        backTrack(nums, ans, temp, 0);
+        return ans;
+    }
+    void backTrack(vector<int>& nums, vector<vector<int>> & ans, vector<int>& temp, int idx) {
+        if(idx == nums.size()) {
+            ans.push_back(temp);
+            return;
+        }
+        temp.push_back(nums[idx]);
+        backTrack(nums, ans, temp, idx+1);
+        temp.pop_back();
+        backTrack(nums, ans, temp, idx+1);
+    }
+};
+```
+
+#### [**39. Combination Sum**](https://leetcode.com/problems/combination-sum/)
+
+Similar to **Question 78**.
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        vector<vector<int>> out;
+        vector<int> temp;
+        backTracking(candidates,out, temp, 0, 0, target);
+        return out;
+    }
+    
+    void backTracking(vector<int> & c, vector<vector<int>> & ans, vector<int> & cur, int idx, int sum, int target) {
+        if(idx == c.size()) {
+            return;
+        }
+        if(sum == target) {
+            ans.push_back(cur);
+            return;
+        } else if(sum > target) {
+            return;
+        } else{
+            cur.push_back(c[idx]);
+            sum += c[idx];
+            backTracking(c, ans, cur, idx,sum, target);
+            sum -= cur.back();
+            cur.pop_back();
+            backTracking(c, ans, cur, idx+1,sum, target);
+        }
+    }
+};
+```
+
+#### [**46. Permutations**](https://leetcode.com/problems/permutations/)
+
+Here is the idea:
+
+We create each permutation by swapping the element in the vector. If two indexes are the same, we do not make any change. After the first index of the element is the back of the vector, we push the current element to the answer.
+
+<img src="LeetCode.assets/image-20220621205309857.png" alt="image-20220621205309857" style="zoom:50%;" />
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> permute(vector<int>& nums) {
+        vector<vector<int>> ans;
+        backT(nums, ans, 0);
+        return ans;
+    }
+    void backT(vector<int>& nums, vector<vector<int>> & ans, int idx) {
+        if(idx == nums.size() -1) {
+            ans.push_back(nums);
+            return;
+        } 
+        for(int i = idx; i < nums.size(); i++) {
+            swap(idx,i, nums);
+            backT(nums, ans, idx +1);
+            swap(idx,i, nums);
+        }
+        
+    }
+    void swap(int a ,int b, vector<int>& nums) {
+        if(a == b) return;
+        int va = nums[a];
+        nums[a] = nums[b];
+        nums[b] = va;
+    }
+    
+};
+```
+
+#### [**90. Subsets II**](https://leetcode.com/problems/subsets-ii/)
+
+Almost the same as **Question 78**. We add a set to check duplicates.
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> subsetsWithDup(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        vector<vector<int>> ans;
+        vector<int> temp;
+        backTrack(nums, ans, temp, 0);
+        return ans;
+    }
+    set<vector<int>> check;
+    void backTrack(vector<int>& nums, vector<vector<int>> & ans, vector<int>& temp, int idx) {
+        if(idx == nums.size()) {
+            if(check.count(temp)) {
+                return;
+            }
+            ans.push_back(temp);
+            check.insert(temp);
+            return;
+        }
+        temp.push_back(nums[idx]);
+        backTrack(nums, ans, temp, idx+1);
+        temp.pop_back();
+        backTrack(nums, ans, temp, idx+1);
+    }
+};
+
+```
+
+#### [**40. Combination Sum II**](https://leetcode.com/problems/combination-sum-ii/)
+
+Since there might be duplicate elements in the vector, we need to sort the vector first. Then, we know first **backTracking** is called when the all element is added, while the second **backTracking** is called when the last element is not chosen. This means that if the next element is the same as the current element, the possible solution has already been added to the answer. Therefore, we can write a loop to check and pass the duplicate elements.
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> combinationSum2(vector<int>& candidates, int target) {
+        sort(candidates.begin(), candidates.end());
+        vector<vector<int>> out;
+        vector<int> temp;
+        int sum = 0;
+        backTracking(candidates,out, temp, 0, sum, target);
+        return out;
+    }
+    void backTracking(vector<int> & c, vector<vector<int>> & ans, vector<int> & cur, int idx, int & sum, int & target) {
+        if(sum == target) {
+            ans.push_back(cur);
+            return;
+        } else if(sum > target) {
+            return;
+        }  else if(idx == c.size()) {
+            return;
+        }else{
+            cur.push_back(c[idx]);
+            sum += c[idx];
+            backTracking(c, ans, cur, idx + 1,sum, target);
+            sum -= c[idx];
+            cur.pop_back();
+            while(idx+1<c.size() && c[idx]==c[idx+1]) idx++;
+            backTracking(c, ans, cur, idx+1,sum, target);
+        }
+    }
+};
+```
+
+#### [**79. Word Search**](https://leetcode.com/problems/word-search/)
+
+Using backtracking. However, we need to make sure the current element was not used previously. We use the vector with the same shape as **board** to check whether the element is used. And we withdraw the check after we finish tracking the current element.
+
+```c++
+class Solution {
+public:
+    int xbound = 0;
+    int ybound = 0;
+    vector<vector<bool>> check2;
+    bool exist(vector<vector<char>>& board, string word) {
+        bool out = false;
+        xbound = board[0].size();
+        ybound = board.size();
+        if(word.length() > xbound*ybound) return false;
+        check2 = vector<vector<bool>>(ybound, vector<bool>(xbound, false));
+        for(int i = 0; i < xbound; i++) {
+            if(out) break;
+            for(int j = 0; j < ybound; j++) {
+                if(out) break;
+                bakcT(board, word, 0, i,j, out);
+                check2[j][i] = false;
+            }
+        } 
+        return out;
+    }
+    bool bakcT(vector<vector<char>>& board, string & word, int idx, int xidx, int yidx, bool & check) {
+        if(check) return false;
+        if(idx == word.size()){
+            check = true;
+            return false;
+        }
+        if(xidx < 0 || xidx >= xbound) {
+            return false;
+        } else if(yidx < 0 || yidx >= ybound) {
+            return false;
+        } else {
+            if(word[idx] == board[yidx][xidx] && check2[yidx][xidx] == false) {
+                check2[yidx][xidx] = true;
+                if(bakcT(board, word, idx+1, xidx+1, yidx, check)) change(xidx+1, yidx);
+                if(bakcT(board, word, idx+1, xidx-1, yidx, check)) change(xidx-1, yidx);
+                if(bakcT(board, word, idx+1, xidx, yidx+1, check)) change(xidx, yidx+1);
+                if(bakcT(board, word, idx+1, xidx, yidx-1, check)) change(xidx, yidx-1);
+                return true;
+            }
+            return false;
+        }
+    }
+    void change(int x, int y) {
+        if(x < 0 || x >= xbound) {
+            return;
+        } else if(y < 0 || y >= ybound) {
+            return;
+        }
+        check2[y][x] = false;
+    }
+};
+```
+
+#### [**131. Palindrome Partitioning**](https://leetcode.com/problems/palindrome-partitioning/)
+
+Backtracking Quesiton.
+
+```c++
+class Solution {
+public:
+    vector<vector<string>> partition(string s) {
+        vector<vector<string>> ans;
+        vector<string> temp;
+        backT(ans, temp, s, 0,1);
+        return ans;
+    }
+    void backT(vector<vector<string>> & ans,vector<string> & temp, string & s, int idx, int end) {
+        if(idx+end > s.length()){
+            if(idx == s.size()) {
+                if(end == 1) ans.push_back(temp);
+                return;
+            }
+            return;
+        }
+        if(isPalindrome(s.substr(idx,end))) {
+            temp.push_back(s.substr(idx,end));
+            backT(ans, temp, s, idx+end, 1);
+            temp.pop_back();
+        }
+        backT(ans, temp, s, idx, end+1);
+    }
+    bool isPalindrome(string s) {
+        string rev = string(s.rbegin(), s.rend());
+        return rev == s;
+    }
+};
+```
+
+#### [**17. Letter Combinations of a Phone Number**](https://leetcode.com/problems/letter-combinations-of-a-phone-number/)
+
+Backtracking question.
+
+```c++
+class Solution {
+public:
+    vector<string> code = {"","","abc","def","ghi", "jkl","mno","pqrs","tuv","wxyz"};
+    vector<string> letterCombinations(string digits) {
+        vector<string> ans;
+        if(digits.length() == 0) return ans;
+        string cur;
+        backTracking(ans, cur, digits, 0);
+        return ans;
+        
+    }
+    void backTracking(vector<string> & ans, string & cur, string & d,int idx1){
+        if(idx1 == d.length()) {
+            ans.push_back(cur);
+            return;
+        }
+        for(int i = 0; i < code[(int)(d[idx1]-'0')].length(); i++) {
+            cur.push_back(code[(int)(d[idx1]-'0')][i]);
+            backTracking(ans, cur, d, idx1+1);
+            cur.pop_back();
+        }
+    }
+};
+```
+
+#### [**51. N-Queens**](https://leetcode.com/problems/n-queens/)
+
+Just like Question 79, we create a new board, **check**, to decide whether the current position can place a queen. We use int to store this value, when a queen affects this region, we let count plus one. When the queen leaves, we let count minus one.  Therefore, the region that count as 0 is the good one to place a queen. Then, we perform a backtracking algorithm.
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> check;
+    int number;
+    vector<vector<string>> solveNQueens(int n) {
+        check = vector<vector<int>>(n, vector<int>(n, 0));
+        vector<vector<string>> ans;
+        vector<string> cur(n,string(n,'.'));
+        number = n;
+        backT(ans, cur, 0, 0, 0);
+        return ans;
+    }
+    void backT(vector<vector<string>> & ans, vector<string> & cur, int num, int xidx, int yidx) {
+        if(num == number) {
+            ans.push_back(cur);
+        }
+        if(yidx == number) return;
+
+        if(check[yidx][xidx] == 0) {
+            xray(xidx, yidx);
+            cur[yidx][xidx] = 'Q';
+            backT(ans,cur,num+1, 0, yidx + 1);
+            cur[yidx][xidx] = '.';
+            xray(xidx,yidx);
+        }
+        if(xidx+1 < number) {
+           backT(ans,cur,num, xidx+1, yidx); 
+        } else {
+            backT(ans,cur,num, 0, yidx+1);
+        }
+            
+        
+    }
+    void xray(int x,int y) {
+        int change = 0;
+        if(check[y][x] == 0) change = 1;
+        else change = -1;
+        for(int i = 0; i < number; i++) {
+            check[y][i] += change;
+            check[i][x] += change;
+            if(x - i >= 0) {
+                if(y -i >= 0) {
+                    check[y-i][x-i] += change;
+                }
+                if(y +i < number) {
+                    check[y+i][x-i] += change;
+                }
+            }
+            if(x + i < number) {
+                if(y -i >= 0) {
+                    check[y-i][x+i] += change;
+                }
+                if(y +i < number) {
+                    check[y+i][x+i] += change;
+                }
+            }
+        }
+        
     }
 };
 ```
