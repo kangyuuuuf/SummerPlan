@@ -25,7 +25,7 @@ We are expecting **10** hours each week to focus on the leetcode. Given 5 weekda
 | Binary Search       | (7/7)    | 6/15            |
 | Linked List         | (11/11)  | 6/16            |
 | Trees               | (15/15)  | 6/17            |
-| Tries               | (2/3)    |                 |
+| Tries               | (3/3)    | 6/22            |
 | Heap/Priority_Queue | (7/7)    | 6/20            |
 | Backtracking        | (9/9)    | 6/22            |
 

@@ -2491,6 +2491,70 @@ public:
 };
 ```
 
+#### [**212. Word Search II**](https://leetcode.com/problems/word-search-ii/)
+
+It is a combination of DFS and trie. We first use trie to store all the words that we need to search. It will help us to reduce the search time when we do the DFS. Then, for each current element, we check whether the current element is in the child of the current trie node. If it exists, call the recursion. If it is not, change to another direction of DFS.
+
+We use the vector of Boolean, **check**, to check whether the current node is iterated. Due to the benefit of backtracking, we can set the check to original when we get out of the recursion.  
+
+```c++
+class Solution {
+public:
+    vector<vector<bool>> check;
+    struct T{
+        vector<T*> child = vector<T*>(26, nullptr);
+        bool isEnd = false;
+        void addNode(string a) {
+            if(child[a[0] - 'a'] == nullptr) {
+                child[a[0] - 'a'] = new T();
+            }
+            if(a.size() == 1) {
+                 child[a[0] - 'a']->isEnd = true;
+            } else child[a[0] - 'a']->addNode(a.substr(1));
+        }
+    };
+    int m;
+    int n;
+    vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
+        
+        m = board[0].size();
+        n = board.size();
+        check = vector<vector<bool>>(n,vector<bool>(m, false));
+        T* head = new T();
+        for(auto w : words) {
+            head->addNode(w);
+        }
+        vector<string> ans;
+        for(int i = 0; i < m; i++)  {
+            for(int j = 0; j < n; j++) {
+                string word = "";
+                DFS(ans, board, i, j, head, word);
+            }
+        }
+        return ans;
+    }
+    void DFS(vector<string> & ans,vector<vector<char>>& board, int xidx, int yidx, T* cur, string & word){
+        if(xidx < 0 || yidx < 0 || xidx >= m || yidx >= n) return;
+        if(check[yidx][xidx] || cur->child[board[yidx][xidx]- 'a'] == nullptr) return;
+        word += board[yidx][xidx];
+        check[yidx][xidx] = true;
+        if(cur->child[board[yidx][xidx] - 'a']->isEnd){
+            if(find(ans.begin(), ans.end(),word) == ans.end()) {
+                ans.push_back(word);
+            }
+        }
+        DFS(ans, board,xidx+1, yidx, cur->child[board[yidx][xidx]- 'a'], word);
+        DFS(ans, board,xidx-1, yidx, cur->child[board[yidx][xidx]- 'a'], word);
+        DFS(ans, board,xidx, yidx+1, cur->child[board[yidx][xidx]- 'a'], word);
+        DFS(ans, board,xidx, yidx-1, cur->child[board[yidx][xidx]- 'a'], word);
+        word.pop_back();
+        check[yidx][xidx] = false;
+    }
+};
+```
+
+
+
 ## Heap/Priority_Queue
 
 A priority queue is a **special type of queue** in which each element is associated with a **priority value**. And, elements are served on the basis of their priority. That is, higher priority elements are served first.
