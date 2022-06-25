@@ -3121,3 +3121,582 @@ public:
 };
 ```
 
+## Graphs
+
+#### [**200. Number of Islands**](https://leetcode.com/problems/number-of-islands/)
+
+DFS question.
+
+```c++
+class Solution {
+public:
+    vector<vector<bool>> check;
+    int m;
+    int n;
+    int numIslands(vector<vector<char>>& grid) {
+        int count = 0;
+        m = grid[0].size();
+        n = grid.size();
+        check = vector<vector<bool>>(n, vector<bool>(m,false));
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < m; j++) {
+                if(grid[i][j] == '1' && check[i][j] == false) {
+                    count++;
+                    DFS(grid, j, i);
+                }
+            }
+        }
+        return count;
+    }
+    
+    void DFS(vector<vector<char>>& grid, int xidx, int yidx) {
+        if(xidx < 0 || yidx < 0 || xidx >= m || yidx >= n) return;
+        if(grid[yidx][xidx] == '0' || check[yidx][xidx]) return;
+        check[yidx][xidx] = true;
+        DFS(grid, xidx-1, yidx);
+        DFS(grid, xidx+1, yidx);
+        DFS(grid, xidx, yidx-1);
+        DFS(grid, xidx, yidx+1);
+    }
+    
+};
+```
+
+#### [**133. Clone Graph**](https://leetcode.com/problems/clone-graph/)
+
+DFS question.
+
+```c++
+class Solution {
+public:
+    Node* cloneGraph(Node* node) {
+        if(node == nullptr) return nullptr;
+        vector<Node*> cur = vector<Node*>(101, nullptr);
+        cur[node->val] = new Node(node->val);
+        DFS(cur, node);
+        return cur[node->val];
+    }
+    void DFS(vector<Node*> & curL, Node* cur){
+        vector<Node*> add;
+        for(auto node : cur -> neighbors){
+            if(curL[node->val] == nullptr){
+                curL[node->val] = new Node(node->val);
+                DFS(curL,node);
+            }
+            add.push_back(curL[node->val]);
+        }
+        curL[cur->val]->neighbors = add;
+    }
+};
+```
+
+#### [**695. Max Area of Island**](https://leetcode.com/problems/max-area-of-island/)
+
+Almost the same as **Question 200**.
+
+```c++
+class Solution {
+public:
+    vector<vector<bool>> check;
+    int m;
+    int n;
+    void DFS(vector<vector<int>>& grid, int xidx, int yidx, int & maxx) {
+        if(xidx < 0 || yidx < 0 || xidx >= m || yidx >= n) return;
+        if(grid[yidx][xidx] == 0 || check[yidx][xidx]) return;
+        maxx++;
+        check[yidx][xidx] = true;
+        DFS(grid, xidx-1, yidx, maxx);
+        DFS(grid, xidx+1, yidx, maxx);
+        DFS(grid, xidx, yidx-1, maxx);
+        DFS(grid, xidx, yidx+1, maxx);
+    }
+    int maxAreaOfIsland(vector<vector<int>>& grid) {
+        int mmax = 0;
+        m = grid[0].size();
+        n = grid.size();
+        check = vector<vector<bool>>(n, vector<bool>(m,false));
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < m; j++) {
+                int maxx = 0;
+                if(grid[i][j] == 1 && check[i][j] == false) {
+                    DFS(grid, j, i, maxx);
+                }
+                mmax = max(mmax, maxx);
+            }
+        }
+        return mmax;
+    }
+    
+};
+```
+
+#### [**417. Pacific Atlantic Waterflow**](https://leetcode.com/problems/pacific-atlantic-water-flow/)
+
+This idea is to do the DFS. Since we know that water in the area next to the ocean can flow to the ocean, we can start our DFS here. We use two vectors to check the Pacific and Atlantic. If the next element is larger than the current element, we do DFS.
+
+```c++
+class Solution {
+public:
+    int m;
+    int n;
+    vector<vector<int>> pacificAtlantic(vector<vector<int>>& heights) {
+        m = heights[0].size();
+        n = heights.size();
+        vector<vector<int>> out;
+        vector<vector<bool>> pac(n, vector<bool>(m, false));
+        vector<vector<bool>> atl(n, vector<bool>(m, false));
+        for(int i = 0; i < n; i++) {
+            DFS(heights,0,i, pac);
+            DFS(heights, m-1, i, atl);
+        }
+        for(int i = 0; i < m; i++) {
+            DFS(heights,i,0, pac);
+            DFS(heights, i, n-1, atl);
+        }
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < m; j++) {
+                if(pac[i][j] && atl[i][j]) {
+                    out.push_back({i,j});
+                }
+            }
+        }
+        return out;
+    }
+    void DFS(vector<vector<int>>& h, int xidx, int yidx, vector<vector<bool>> & vis) {
+        if(vis[yidx][xidx] == true) return;
+        vis[yidx][xidx] = true;
+        if(xidx > 0) {
+            if(h[yidx][xidx] <= h[yidx][xidx-1] && !vis[yidx][xidx - 1]){
+                DFS(h, xidx-1, yidx, vis);
+            }
+        }
+        if(yidx > 0) {
+            if(h[yidx][xidx] <= h[yidx - 1][xidx] && !vis[yidx - 1][xidx]){
+                DFS(h, xidx, yidx-1, vis);
+            }
+        }
+        if(xidx < m - 1) {
+            if(h[yidx][xidx] <= h[yidx][xidx+1] && !vis[yidx][xidx + 1]){
+                DFS(h, xidx+1, yidx, vis);
+            }
+        }
+        if(yidx < n - 1) {
+            if(h[yidx][xidx] <= h[yidx + 1][xidx] && !vis[yidx + 1][xidx]){
+                DFS(h, xidx, yidx+1, vis);
+            }
+        }
+    }
+};
+```
+
+#### [**130. Surrounded Regions**](https://leetcode.com/problems/surrounded-regions/)
+
+Same idea as **Question 417**.
+
+```c++
+class Solution {
+public:
+    vector<vector<bool>> vis;
+    int m;
+    int n;
+    void solve(vector<vector<char>>& board) {
+        m = board[0].size();
+        n = board.size();
+        vis = vector<vector<bool>>(n, vector<bool>(m, false));
+        for(int i = 0; i < m; i++) {
+            if(board[0][i] == 'O') DFS(board, i,0);
+            if(board[n-1][i] == 'O') DFS(board, i,n-1);
+        }
+        for(int i = 0; i < n; i++) {
+            if(board[i][0] == 'O') DFS(board, 0,i);
+            if(board[i][m-1] == 'O') DFS(board, m-1,i);
+        }
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < m; j++) {
+                if(!vis[i][j]) {
+                    board[i][j] = 'X';
+                }
+            }
+        }
+    }
+     void DFS(vector<vector<char>>& h, int xidx, int yidx) {
+        if(vis[yidx][xidx] == true) return;
+        vis[yidx][xidx] = true;
+        if(xidx > 0) {
+            if(h[yidx][xidx-1] == 'O' && !vis[yidx][xidx - 1]){
+                DFS(h, xidx-1, yidx);
+            }
+        }
+        if(yidx > 0) {
+            if(h[yidx - 1][xidx] == 'O' && !vis[yidx - 1][xidx]){
+                DFS(h, xidx, yidx-1);
+            }
+        }
+        if(xidx < m - 1) {
+            if(h[yidx][xidx+1] == 'O' && !vis[yidx][xidx + 1]){
+                DFS(h, xidx+1, yidx);
+            }
+        }
+        if(yidx < n - 1) {
+            if(h[yidx + 1][xidx] == 'O' && !vis[yidx + 1][xidx]){
+                DFS(h, xidx, yidx+1);
+            }
+        }
+    }
+};
+```
+
+#### [**994. Rotting Oranges**](https://leetcode.com/problems/rotting-oranges/)
+
+DFS question.
+
+```c++
+class Solution {
+public:
+    int m;
+    int n;
+    vector<vector<bool>> check;
+    int orangesRotting(vector<vector<int>>& grid) {
+        m = grid[0].size();
+        n = grid.size();
+        queue<pair<int,int>> q;
+        int count = 0;
+        int left = 0;
+        check = vector<vector<bool>>(n, vector<bool>(m, false));
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < m; j++){
+                if(grid[i][j] == 0){
+                    check[i][j] = true;
+                } else if(grid[i][j] == 1){
+                    left++;
+                    
+                } else {
+                    left++;
+                    q.push(make_pair(i,j));
+                }
+            }
+        }
+        while(!q.empty()){
+            int cur = q.size();
+            for(int i = 0; i < cur; i++) {
+                DFS(grid, q.front(), left, q);
+                q.pop();
+            }
+            if(left == 0) return count;
+            count++;
+        }
+        if(left == 0) return count;
+        return -1;
+    }
+    void DFS(vector<vector<int>>& g, pair<int,int> & p, int & left, queue<pair<int,int>> & q) {
+        if(check[p.first][p.second]) return;
+        check[p.first][p.second] = true;
+        left--;
+        if(p.first > 0) {
+            if(!check[p.first-1][p.second]) q.push(make_pair(p.first-1, p.second));
+        }
+        if(p.second > 0) {
+            if(!check[p.first][p.second-1]) q.push(make_pair(p.first, p.second-1));
+        }
+        if(p.first < n -1) {
+            if(!check[p.first+1][p.second]) q.push(make_pair(p.first+1, p.second));
+        }
+        if(p.second < m -1) {
+            if(!check[p.first][p.second+1]) q.push(make_pair(p.first, p.second+1));
+        }
+        
+    }
+};
+```
+
+#### [**Walls and Gates**](https://www.lintcode.com/problem/663/)
+
+DFS question.
+
+```c++
+class Solution {
+public:
+     int m;
+     int n;
+    void wallsAndGates(vector<vector<int>> &rooms) {
+        // write your code here
+        m = rooms[0].size();
+        n = rooms.size();
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < m; j++) {
+                if(rooms[i][j] == 0) {
+                    DFS(rooms, i+1, j, 1);
+                    DFS(rooms, i-1, j, 1);
+                    DFS(rooms, i, j+1, 1);
+                    DFS(rooms, i, j-1, 1);
+                }
+            }
+        }
+    }
+    void DFS(vector<vector<int>> &  r, int yidx, int xidx, int depth) {
+        if(yidx < 0 || xidx < 0 || yidx >= n || xidx >= m) return;
+        if(depth >= r[yidx][xidx] || r[yidx][xidx] == -1) return;
+        r[yidx][xidx] = depth;
+        DFS(r, yidx, xidx+1, depth+1);
+        DFS(r, yidx, xidx-1, depth+1);
+        DFS(r, yidx+1, xidx, depth+1);
+        DFS(r, yidx-1, xidx, depth+1);
+    }
+};
+```
+
+#### [**207. Course Schedule**](https://leetcode.com/problems/course-schedule/)
+
+We use a vector to store all the prerequisites that the current node needed. And we use vector of boolean to check the current node is a valid course to choose. And the third vector is to check there is a loop when we DFS the graph. If it is a loop, return false.
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> map;
+    vector<bool> check;
+    vector<bool> check3;
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        check = vector<bool>(numCourses, false);
+        check3 = vector<bool>(numCourses, false);
+        map = vector<vector<int>>(numCourses, vector<int>());
+        for(auto a : prerequisites) {
+            map[a[0]].push_back(a[1]);
+        }
+        for(int i = 0; i < numCourses; i++) {
+            if(!DFS(i)) {
+                return false;
+            }
+            check3[i] = false;
+        }
+        return true;
+    }
+    bool DFS(int i) {
+        if(check3[i]) return false;
+        check3[i] = true;
+        if(check[i] == true) return true;
+        bool check1 = true;
+        for(int j = 0; j < map[i].size(); j++) {
+            check1 = check1 && DFS(map[i][j]);
+            check3[map[i][j]] = false;
+        }
+        check[i] = check1;
+        return check1;
+    }
+};
+```
+
+#### [**210. Course Schedule II**](https://leetcode.com/problems/course-schedule-ii/)
+
+Almost same as **Question 207**.
+
+```c++
+class Solution {
+public:
+    vector<vector<int>> map;
+    vector<bool> check;
+    vector<bool> check3;
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+        check = vector<bool>(numCourses, false);
+        check3 = vector<bool>(numCourses, false);
+        vector<int> out;
+        map = vector<vector<int>>(numCourses, vector<int>());
+        for(auto a : prerequisites) {
+            map[a[0]].push_back(a[1]);
+        }
+        for(int i = 0; i < numCourses; i++) {
+            if(!DFS(i, out)) {
+                return vector<int>();
+            }
+            check3[i] = false;
+        }
+        return out;
+    }
+    bool DFS(int i, vector<int> & out) {
+        if(check3[i]) return false;
+        check3[i] = true;
+        if(check[i]) return true;
+        bool check1 = true;
+        for(int j = 0; j < map[i].size(); j++) {
+            check1 = check1 && DFS(map[i][j], out);
+            check3[map[i][j]] = false;
+        }
+        check[i] = check1;
+        out.push_back(i);
+        return check1;
+    }
+};
+```
+
+#### [**684. Redundant Connection**](https://leetcode.com/problems/redundant-connection/)
+
+In this question, we use the union set. 
+
+```c++
+class Solution {
+public:
+    vector<int> _elems;
+    vector<int> findRedundantConnection(vector<vector<int>>& edges) {
+        _elems = vector<int>(edges.size()+1, -1);
+        for(auto edge : edges){
+            if(find(edge[1]) == find(edge[0]) && find(edge[0]) != -1) {
+                return edge;
+            } else {
+                setunion(edge[0], edge[1]);
+            }
+        }
+        return vector<int>();
+    }
+    
+    int find(int elem) {
+        int outcome = elem;
+        if(_elems[elem] >= 0) {
+            outcome = find(_elems[elem]);
+            _elems[elem] = outcome;
+        }
+        return outcome;
+    }
+    int size(int elem) {
+    //find head
+        int head = find(elem);
+        return -_elems[head];
+    }
+    void setunion(int a, int b) {
+        int size1 = size(a);
+        int size2 = size(b);
+        int find1 = find(a);
+        int find2 = find(b);
+        if(find1 == find2) {
+            return;
+        }
+        if(size1 < size2) {
+            _elems[find2] += _elems[find1];
+            _elems[find1] = find2;
+        } else {
+            _elems[find1] += _elems[find2];
+            _elems[find2] = find1;
+        }
+    }
+};
+```
+
+#### [**Graph Valid Tree**](https://www.lintcode.com/problem/graph-valid-tree/description)
+
+Using union set.
+
+```c++
+class Solution {
+public:
+    vector<int> _elems;
+    
+    int find(int elem) {
+        int outcome = elem;
+        if(_elems[elem] >= 0) {
+            outcome = find(_elems[elem]);
+            _elems[elem] = outcome;
+        }
+        return outcome;
+    }
+    int size(int elem) {
+    //find head
+        int head = find(elem);
+        return -_elems[head];
+    }
+    void setunion(int a, int b) {
+        int size1 = size(a);
+        int size2 = size(b);
+        int find1 = find(a);
+        int find2 = find(b);
+        if(find1 == find2) {
+            return;
+        }
+        if(size1 < size2) {
+            _elems[find2] += _elems[find1];
+            _elems[find1] = find2;
+        } else {
+            _elems[find1] += _elems[find2];
+            _elems[find2] = find1;
+        }
+    }
+    bool validTree(int n, vector<vector<int>> &edges) {
+        _elems = vector<int>(n, -1);
+        for(auto edge : edges){
+            if(find(edge[1]) == find(edge[0]) && find(edge[0]) != -1) {
+                return false;
+            } else {
+                setunion(edge[0], edge[1]);
+            }
+        }
+        int count = 0;
+        for(auto a : _elems) {
+            if(a < 0) {
+                count++;
+            }
+            if(count == 2) return false;
+        }
+        return true;
+    }
+};
+```
+
+#### [**127. Word Ladder**](https://leetcode.com/problems/word-ladder/)
+
+We use BFS to finish this question.
+
+```c++
+class Solution {
+public:
+    int len;
+    int ladderLength(string beginWord, string endWord, vector<string>& wordList) {
+        len = beginWord.length();
+        unordered_map<string, bool> check;
+        unordered_map<string, vector<string>> map;
+        
+        for(int i = 0; i < wordList.size(); i++) {
+            check[wordList[i]] = false;
+            if(differ(beginWord, wordList[i])) {
+                map[beginWord].push_back(wordList[i]);
+                map[wordList[i]].push_back(beginWord);
+            }
+            for(int j = i; j < wordList.size(); j++) {
+                if(differ(wordList[i], wordList[j])) {
+                    
+                    map[wordList[i]].push_back(wordList[j]);
+                    map[wordList[j]].push_back(wordList[i]);
+                }
+            }
+        }
+        queue<string> q;
+        q.push(beginWord);
+        if(map.find(endWord) == map.end()) return 0;
+        int count = 0;
+        while(!q.empty()) {
+            int c = q.size();
+            count++;
+            for(int i = 0; i < c; i++) {
+                string cur = q.front();
+                cout<< cur <<endl;
+                check[cur] = true;
+                q.pop();
+                if(cur == endWord) return count;
+                for(auto & a : map[cur]){
+                    if(!check[a]) q.push(a);
+                }
+            }  
+        }
+        return 0;
+    }
+    bool differ(string & s1, string & s2) {
+        int count = 0;
+        for(int i = 0; i < len; i++) {
+            if(s1[i] != s2[i]){
+                count++;
+                if(count == 2) {
+                    return false;
+                }
+            }
+        }
+        return count == 1 ? true:false;
+    }
+};
+```
+

@@ -34,4 +34,10 @@ It is used for discovery, which is intended for a single investigator or collabo
 
 It is used for communication, which is intended for large groups or mass audiences. It does not support user input and it is highly polished.
 
-### 1.3 2-D Graphics
+### 1.2 2-D Graphics
+
+#### Vector Graphics VS Graster Graphics
+
+Vector Graphics uses low memory and is easy to draw lines. Raster Graphics uses high memory and it is arbitrary fills.
+
+<img src="Data%20Visualization.assets/image-20220624173459376.png" alt="image-20220624173459376" style="zoom: 33%;" />

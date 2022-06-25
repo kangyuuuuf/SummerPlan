@@ -28,6 +28,7 @@ We are expecting **10** hours each week to focus on the leetcode. Given 5 weekda
 | Tries               | (3/3)    | 6/22            |
 | Heap/Priority_Queue | (7/7)    | 6/20            |
 | Backtracking        | (9/9)    | 6/22            |
+| Graphs              | (12/12)  | 6/25            |
 
 For the introduction of the Algorithm, we will meet twice a week, Tuesday and Thursday, to discuss the question in the book. Before each meeting, we need to finish the reading of the book. The meeting will last 3 hours.
 
