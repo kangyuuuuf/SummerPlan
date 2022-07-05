@@ -3700,3 +3700,394 @@ public:
 };
 ```
 
+## 1-D Dynamic Programming
+
+Dynamic programming (DP) is a technique used by programmers to solve problems wherein the problems are broken down to smaller sub problems (that have the same nature as that of the main problem) which are solved just once, and the results of the computation are saved for the future so that we need not compute the saved results again. 
+
+#### [**70. Climbing Stairs**](https://leetcode.com/problems/climbing-stairs/)
+
+We use the tabular method to solve the problem. Since the n is less than 46, we can create an array with 47 lengths. Then, we  use the last two number in the array to find the current number.
+
+```c++
+class Solution {
+public:
+    int climbStairs(int n) {
+        int dp[46];
+        dp[1] = 1;
+        dp[2] = 2;
+        for(int i = 3; i <= n; i++) {
+            dp[i] = dp[i-1]+dp[i-2];
+        }
+        return dp[n];
+    }
+};
+```
+
+#### [**746. Min Cost Climbing Stairs**](https://leetcode.com/problems/min-cost-climbing-stairs/)
+
+Similar question.
+
+```c++
+class Solution {
+public:
+    int minCostClimbingStairs(vector<int>& cost) {
+        int check[cost.size()];
+        check[0] = cost[0];
+        check[1] = cost[1];
+        for(int i = 2; i < cost.size(); i++) {
+            check[i] = min(check[i-1],check[i-2]) + cost[i];
+        }
+        return min(check[cost.size()-1],check[cost.size()-2]);
+    }
+};
+```
+
+#### [**198. House Robber**](https://leetcode.com/problems/house-robber/)
+
+DP question.
+
+```c++
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        if(nums.size() == 1) return nums[0];
+        if(nums.size() == 2) return max(nums[1], nums[0]);
+        int check[nums.size()];
+        check[0] = nums[0];
+        check[1] = nums[1];
+        check[2] = check[0]+nums[2];
+        for(int i = 3; i < nums.size(); i++) {
+            check[i] = max(check[i-3],check[i-2]) + nums[i];
+        }
+        return max(check[nums.size()-1], check[nums.size()-2]);
+    }
+};
+```
+
+#### [**213. House Robber II**](https://leetcode.com/problems/house-robber-ii/)
+
+In this question, we need to handle the connection between the head and tail of the vector. Therefore, when the head contributes to the sum, the tail cannot count.  We choose to run the DP twice, from 0 to n-2 and 1 to n-1. If the max sum does not need the head and tail, the outcome should be equal. Otherwise, the larger sum will be the answer. 
+
+```c++
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        return max(help1(nums), help2(nums));
+    }
+    int help1(vector<int>& nums) {
+        if(nums.size() == 1) return nums[0];
+        if(nums.size() == 2) return nums[0];
+        int check[nums.size()];
+        check[0] = nums[0];
+        check[1] = nums[1];
+        check[2] = check[0]+nums[2];
+        for(int i = 3; i < nums.size()-1; i++) {
+            check[i] = max(check[i-3],check[i-2]) + nums[i];
+        }
+        return max(check[nums.size()-2], check[nums.size()-3]);
+    }
+    int help2(vector<int>& nums) {
+        if(nums.size() == 1) return nums[0];
+        if(nums.size() == 2) return nums[1];
+        int check[nums.size()];
+        check[0] = nums[1];
+        check[1] = nums[2];
+        check[2] = check[0]+nums[3];
+        for(int i = 3; i < nums.size()-1; i++) {
+            check[i] = max(check[i-3],check[i-2]) + nums[i+1];
+        }
+        return max(check[nums.size()-2], check[nums.size()-3]);
+    }
+};
+```
+
+#### [**5. Longest Palindromic Substring**](https://leetcode.com/problems/longest-palindromic-substring/)(Unable to Solve)
+
+To improve over the brute force solution, we first observe how we can avoid unnecessary re-computation while validating palindromes. Consider the case "ababa". If we already knew that "bab" is a palindrome, it is obvious that "ababa" must be a palindrome since the two left and right end letters are the same.
+
+We define P(i,j) as following:
+
+- P(i,i) = true
+- P(i,i+1) = (s[i] == s[i+1])
+- P(i,j) = (s[i] == s[j]) && P(i-1,j+1)
+
+```c++
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        bool dp[s.length()][s.length()];
+        int count = 0;
+        int posi = 0;
+        for(int i = 0; i < s.length(); i++) {
+            for(int j = i, k = 0; j < s.length(); j++, k++) {
+                
+                if(i==0) dp[i+k][j] = true;
+                else if(i==1) dp[i+k][k] = (s[i+k] == s[k]);
+                else {
+                    dp[i+k][k] = dp[i+k-1][k+1] && (s[i+k] == s[k]);
+                }
+                if(dp[i+k][k]) {
+                    if((i + 1)> count) {
+                        posi = k;
+                        count = (i+1);
+                    }
+                }
+            }
+        }
+        return s.substr(posi, count);
+        
+    }
+};
+```
+
+#### [**Palindromic Substrings**](https://leetcode.com/problems/palindromic-substrings/)
+
+Similar question.
+
+```C++
+class Solution {
+public:
+    int countSubstrings(string s) {
+        int out = 0;
+        bool dp[s.length()][s.length()];
+        for(int i = 0; i < s.length(); i++) {
+            for(int j = i, k = 0; j < s.length(); j++, k++) {
+                
+                if(i==0) dp[i+k][j] = true;
+                else if(i==1) dp[i+k][k] = (s[i+k] == s[k]);
+                else {
+                    dp[i+k][k] = dp[i+k-1][k+1] && (s[i+k] == s[k]);
+                }
+                if(dp[i+k][k]) {
+                    out++;
+                }
+            }
+        }
+        return out;
+    }
+};
+```
+
+#### [**91. Decode Ways**](https://leetcode.com/problems/decode-ways/)(Unable to Solve)
+
+We tried Backtracking, but it is time out.
+
+```c++
+class Solution {
+public:
+    int numDecodings(string s) {
+        int count = 0;
+        BT(count, s, 0);
+        return count;
+    }
+    void BT(int & count, string & s, int index) {
+        if(s[index] == '0') return;
+        if(s.length() == index) {
+            count++;
+            return;
+        }
+        BT(count, s, index+1);
+        if(index < s.length() - 1) {
+            if(stoi(s.substr(index, 2)) < 27){
+                BT(count, s, index+2);
+            }
+        }
+    }
+};
+```
+
+We know that for each char we have, it has two solution:
+
+- A single number is not 0, it is a valid way to decode.
+- The current number combined with the last number is less then 27, it is a valid way to decode.
+
+And when the first situation happened, the way will become the sum of all the paths we have for the last index. When the second situation happened, the way will become the single char sum.
+
+We can get the rule:
+$$
+dp[0][i] = dp[0][i-1]+dp[i-1] \\
+dp[1][i] = dp[0][i-1] = dp[0][i-2]+dp[i-2]
+$$
+Here is the code:
+
+```c++
+class Solution {
+public:
+    int numDecodings(string s) {
+        int dp[2][s.length()];
+        dp[0][0] = s[0] != '0';
+        dp[1][0] = 0;
+        for(int i = 1; i < s.length(); i++) {
+            if(s[i] == '0') {
+                dp[0][i] = 0;
+            } else{
+                dp[0][i] = dp[0][i-1] + dp[1][i-1];
+            }
+            if(s[i-1] == '1' || s[i-1] == '2' && s[i] < '7'){
+                dp[1][i] = dp[0][i-1];
+            } else {
+                dp[1][i] = 0;
+            }
+        }
+        return dp[0][s.length()-1] + dp[1][s.length()-1];
+    }
+};
+```
+
+#### [**322. Coin Change**](https://leetcode.com/problems/coin-change/)
+
+Since Backtracking is used to find all the possible solution, it is not efficiency for finding the optimized answer.
+
+```c++
+class Solution {
+public:
+    int coinChange(vector<int>& coins, int amount) {
+        int maxv = INT_MAX;
+        BT(coins, amount, 0, maxv);
+        return maxv == INT_MAX ?  -1 : maxv;
+    }
+    void BT(vector<int>& c, int r, int cur, int & maxv){
+        if(cur >= maxv) return;
+        if(r < 0) return;
+        if(r == 0) {
+            maxv = min(maxv, cur);
+            return;
+        }
+        for(auto n : c) {
+            BT(c,r-n, cur+1, maxv);
+        }
+    }
+};
+```
+
+Let's try DP. Backtracking is from top to bottom: we let the current left minus each coin to find the best answer. We could use DP to search from bottom to top. For the current amount, we can just calculate by (**amount** - each coin). Since we calculate from 0 to amount,  we know the outcome of (**amount** - each coin). Then, for each value, we just need to itearate each coin to find the best answer for the current value.
+
+```c++
+class Solution {
+public:
+    int dp[10000];
+    int coinChange(vector<int>& coins, int amount) {
+        if(amount == 0) return 0;
+        sort(coins.begin(), coins.end());
+        for(int i = 1; i <= amount; i++) {
+            dp[i-1] = -1;
+            for(auto & c : coins){
+                if(i - c > 0){
+                    if(dp[i-c-1] == -1) continue;
+                    else if(dp[i-1] == -1) dp[i-1] = dp[i-c-1]+1;
+                    else dp[i-1] = min(dp[i-1], dp[i-c-1]+1);
+                }
+                else if(i - c < 0) break;
+                else if(i - c == 0) dp[i-1] = 1;
+            }
+        }
+        return dp[amount-1];
+    }
+};
+```
+
+#### [**152. Maximum Product Subarray**](https://leetcode.com/problems/maximum-product-subarray/)(Unable to Solve)
+
+It is more like a sliding window without a border. If the current number is negative, it can become max if it product with min value.
+
+```c++
+class Solution {
+public:
+    int maxProduct(vector<int>& nums) {
+        int out = INT_MIN;
+        int curMax = 1;
+        int curMin = 1;
+        for(auto n : nums) {
+            if(n == 0) {
+                curMax = 1;
+                curMin = 1;
+            }
+            int temp = curMax;
+            curMax = max(n, max(n* curMax, n* curMin));
+            curMin = min(n, min(n* temp, n* curMin));
+            out = max(curMax, out);
+        }
+        return out;
+    }
+    
+};
+```
+
+#### [**139. Word Break**](https://leetcode.com/problems/word-break/)(Unable to Solve)
+
+In this question, we use a bool array to solve the question. Our base case is the string.end() = true; Then, we iterate from the back, finding the substring from the current index has a match from the **wordDict**. If it has the match and the index of string.end() indicates it is a valid path from the back, the current index is true.
+
+```c++
+class Solution {
+public:
+    bool wordBreak(string s, vector<string>& wordDict) {
+        bool dp[s.length()+1];
+        dp[s.length()] = true;
+        for(int i = s.size() - 1; i >= 0; i--) {
+            dp[i] = false;
+            for(auto & word : wordDict) {
+                if(word.length() + i > s.length()) continue;
+                else {
+                    dp[i] = (word == s.substr(i, word.length())) && dp[i+word.length()];
+                    if(dp[i]) break;
+                }
+            }
+            
+        }
+        return dp[0];
+    }
+};
+```
+
+#### [**300. Longest Increasing Subsequence**](https://leetcode.com/problems/longest-increasing-subsequence/)
+
+We use DP. Let the current = max(current, dp[back]+ 1).
+
+```c++
+class Solution {
+public:
+    int lengthOfLIS(vector<int>& nums) {
+        int dp[nums.size()];
+        int maxv = 0;
+        for(int i = nums.size() - 1; i >= 0; i--) {
+            dp[i] = 1;
+            for(int j = i+ 1; j < nums.size(); j++) {
+                if(nums[i] < nums[j]) {
+                    dp[i] = max(dp[j] + 1, dp[i]);
+                }
+            }
+            maxv = max(dp[i], maxv);
+        }
+        return maxv;
+    }
+};
+```
+
+#### [**416. Partition Equal Subset Sum**](https://leetcode.com/problems/partition-equal-subset-sum/)
+
+DP question. We use a set to store the value we have. Then, we do not need to do the all the possible product.
+
+```c++
+class Solution {
+public:
+    bool canPartition(vector<int>& nums) {
+        int sum = 0;
+        for(auto & num : nums) {
+            sum += num;
+        }
+        if(sum % 2 != 0) return false;
+        sum /= 2;
+        set<int> s;
+        s.insert(0);
+        for(auto & num : nums) {
+            vector<int> add;
+            for(auto & n : s){
+                add.push_back(n+num);
+            }
+            s.insert(add.begin(), add.end());
+        }
+        return s.find(sum) != s.end();
+    }
+};
+```
+
