@@ -4091,3 +4091,98 @@ public:
 };
 ```
 
+## 2-D Dynamic Programming
+
+Similar to 1-D DP. 2-D DP need $n^2$ space complexity to solve the problem.
+
+#### [**62. Unique Paths**](https://leetcode.com/problems/unique-paths/)
+
+Since it can only move down or right. The possible path that passes the current grid is equal to the number of paths from up and left grids. 
+
+```c++
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+        int dp[m][n];
+        dp[0][0] = 1;
+        for(int i = 0; i < m; i++) dp[i][0] = 1;
+        for(int i = 0; i < n; i++) dp[0][i] = 1;
+        for(int i = 1; i < m; i++) {
+            for(int j = 1; j < n; j++) {
+                dp[i][j] = dp[i-1][j] + dp[i][j-1];
+            }
+        }
+        return dp[m-1][n-1];
+    }
+};
+```
+
+#### [**1143. Longest Common Subsequence**](https://leetcode.com/problems/longest-common-subsequence/)(Unable to Solve)
+
+Here is the basic idea.
+
+|      | a          | b    | c    | d    | e           |
+| ---- | ---------- | ---- | ---- | ---- | ----------- |
+| a    | **end**, 3 | 2    | 2    | 1    | 1           |
+| c    | 2          | 2    | 2    | 1    | 1           |
+| e    | 1          | 1    | 1    | 1    | **Start**,1 |
+
+```c++
+class Solution {
+public:
+    int longestCommonSubsequence(string text1, string text2) {
+        int m = text1.length();
+        int n = text2.length();
+        vector<vector<int>> dp(m + 1, vector<int>(n + 1));
+        for(int i = m -1; i >= 0; i--) {
+            for(int j = n -1; j >= 0; j--) {
+                if(text1[i] == text2[j]) {
+                    dp[i][j] = 1 + dp[i+1][j+1];
+                } else {
+                    dp[i][j] = max(dp[i+1][j], dp[i][j+1]);
+                }
+            }
+        }
+        return dp[0][0];
+    }
+};
+```
+
+## Dynamic Programming Practice
+
+#### 509. Fibonacci Number
+
+```c++
+class Solution {
+public:
+    int dp[31];
+    int fib(int n) {
+        dp[0] = 0;
+        dp[1] = 1;
+        for(int i = 2; i <= n; i++) {
+            dp[i] = dp[i-1] + dp[i-2];
+        }
+        return dp[n];
+    }
+    
+};
+```
+
+#### 1137. N-th Tribonacci Number
+
+```c++
+class Solution {
+public:
+    int dp[38];
+    int tribonacci(int n) {
+        dp[0] = 0;
+        dp[1] = 1;
+        dp[2] = 1;
+        for(int i = 3; i <= n; i++) {
+            dp[i] = dp[i-1]+dp[i-2]+dp[i-3];
+        }
+        return dp[n];
+    }
+};
+```
+
